@@ -55,13 +55,6 @@ import static net.sourceforge.cobertura.javancss.parser.java15.JavaParser15Const
  * @author Sreenivasa Viswanadha - Simplified and enhanced for 1.5
  */
 public class JavaParser15 implements JavaParserInterface {
-    private int _ncss = 0;     // general counter
-    private int _loc = 0;
-    private String _sPackage = "";
-    private String _sClass = "";
-    private String _sFunction = "";
-    private int _jvdc = 0;
-
     /**
      * For each class the number of formal
      * comments in toplevel methods, constructors, inner
@@ -95,16 +88,16 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     public int getNcss() {
-        return _ncss;
+        return 0;
     }
 
     public int getLOC() {
-        return _loc;
+        return 0;
     }
 
     // added by SMS
     public int getJvdc() {
-        return _jvdc;
+        return 0;
     }
 
     /*public int getTopLevelClasses() {
@@ -148,7 +141,7 @@ public class JavaParser15 implements JavaParserInterface {
      * is not very useful.
      */
     public String getLastFunction() {
-        return _sPackage + _sClass + _sFunction;
+        return "";
     }
 
     /**
