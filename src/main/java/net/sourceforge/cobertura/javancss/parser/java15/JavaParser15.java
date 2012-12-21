@@ -41,11 +41,13 @@
 package net.sourceforge.cobertura.javancss.parser.java15;
 
 import net.sourceforge.cobertura.javancss.FunctionMetric;
-import net.sourceforge.cobertura.javancss.ObjectMetric;
 import net.sourceforge.cobertura.javancss.PackageMetric;
 import net.sourceforge.cobertura.javancss.parser.JavaParserInterface;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static net.sourceforge.cobertura.javancss.parser.java15.JavaParser15Constants.*;
 
@@ -55,65 +57,17 @@ import static net.sourceforge.cobertura.javancss.parser.java15.JavaParser15Const
  * @author Sreenivasa Viswanadha - Simplified and enhanced for 1.5
  */
 public class JavaParser15 implements JavaParserInterface {
-    /**
-     * For each class the number of formal
-     * comments in toplevel methods, constructors, inner
-     * classes, and for the class itself are counted.
-     * The top level comment has to be directly before
-     * the class definition, not before the package or
-     * import statement as it is often seen in source code
-     * examples (at the beginning of your source files you
-     * should instead put your copyright notice).
-     */
-//    private int _javadocs = 0;              // global javadocs
-    // holds the statistics for each method
     private List<FunctionMetric> _vFunctions = new ArrayList<FunctionMetric>();
 
-    /**
-     * Metrics for each class/interface are stored in this
-     * vector.
-     */
-    private List<ObjectMetric> _vClasses = new ArrayList<ObjectMetric>();
     private List _vImports = new ArrayList();
-    private Object[] _aoPackage = null;
     private Map<String, PackageMetric> _htPackage = new HashMap<String, PackageMetric>();
-//    private PackageMetric _pPackageMetric;
 
     public void parse() throws Exception {
         compilationUnit();
     }
 
-    public void parseImportUnit() throws Exception {
-        ImportUnit();
-    }
-
-    public int getNcss() {
-        return 0;
-    }
-
-    public int getLOC() {
-        return 0;
-    }
-
-    // added by SMS
-    public int getJvdc() {
-        return 0;
-    }
-
-    /*public int getTopLevelClasses() {
-      return _topLevelClasses;
-      }*/
-
     public List<FunctionMetric> getFunction() {
         return _vFunctions;
-    }
-
-    /**
-     * @return Top level classes in sorted order
-     */
-    public List<ObjectMetric> getObject() {
-        Collections.sort(_vClasses);
-        return _vClasses;
     }
 
     /**
@@ -125,13 +79,6 @@ public class JavaParser15 implements JavaParserInterface {
 
     public List getImports() {
         return _vImports;
-    }
-
-    /**
-     * name, beginLine, ...
-     */
-    public Object[] getPackageObjects() {
-        return _aoPackage;
     }
 
     /**
@@ -324,81 +271,6 @@ public class JavaParser15 implements JavaParserInterface {
         jj_consume_token(PACKAGE);
         Name();
         jj_consume_token(SEMICOLON);
-    }
-
-    final public void ImportUnit() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case ABSTRACT:
-            case FINAL:
-            case NATIVE:
-            case PACKAGE:
-            case PRIVATE:
-            case PROTECTED:
-            case PUBLIC:
-            case STATIC:
-            case STRICTFP:
-            case SYNCHRONIZED:
-            case TRANSIENT:
-            case VOLATILE:
-            case AT:
-                PackageDeclaration();
-                break;
-            default:
-        }
-        label_3:
-        while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case IMPORT:
-                    break;
-                default:
-                    break label_3;
-            }
-            ImportDeclaration();
-        }
-        label_4:
-        while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case ABSTRACT:
-                case FINAL:
-                case PUBLIC:
-                case STRICTFP:
-                case SYNCHRONIZED:
-                    break;
-                default:
-                    break label_4;
-            }
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case ABSTRACT:
-                    jj_consume_token(ABSTRACT);
-                    break;
-                case FINAL:
-                    jj_consume_token(FINAL);
-                    break;
-                case PUBLIC:
-                    jj_consume_token(PUBLIC);
-                    break;
-                case SYNCHRONIZED:
-                    jj_consume_token(SYNCHRONIZED);
-                    break;
-                case STRICTFP:
-                    jj_consume_token(STRICTFP);
-                    break;
-                default:
-                    jj_consume_token(-1);
-                    throw new ParseException();
-            }
-        }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-            case CLASS:
-                jj_consume_token(CLASS);
-                break;
-            case INTERFACE:
-                jj_consume_token(INTERFACE);
-                break;
-            default:
-                jj_consume_token(-1);
-                throw new ParseException();
-        }
     }
 
     final public void ImportDeclaration() throws ParseException {
