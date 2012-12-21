@@ -45,11 +45,7 @@ import net.sourceforge.cobertura.javancss.ObjectMetric;
 import net.sourceforge.cobertura.javancss.PackageMetric;
 import net.sourceforge.cobertura.javancss.parser.JavaParserInterface;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static net.sourceforge.cobertura.javancss.parser.java15.JavaParser15Constants.*;
 
@@ -438,11 +434,7 @@ public class JavaParser15 implements JavaParserInterface {
  */
     final public int Modifiers() throws ParseException {
         int modifiers = 0;
-        label_5:
-        while (true) {
-            if (!jj_2_2(2)) {
-                break label_5;
-            }
+        while (!jj_2_2(2)) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                 case PUBLIC:
                     jj_consume_token(PUBLIC);
@@ -496,17 +488,13 @@ public class JavaParser15 implements JavaParserInterface {
                     throw new ParseException();
             }
         }
-        {
-            if (true) return modifiers;
-        }
-        throw new Error("Missing return statement in function");
+        return modifiers;
     }
 
     /*
  * Declaration syntax follows.
  */
     final public void TypeDeclaration() throws ParseException {
-        int modifiers;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case SEMICOLON:
                 jj_consume_token(SEMICOLON);
@@ -526,17 +514,16 @@ public class JavaParser15 implements JavaParserInterface {
             case TRANSIENT:
             case VOLATILE:
             case AT:
-                modifiers = Modifiers();
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                     case CLASS:
                     case INTERFACE:
-                        ClassOrInterfaceDeclaration(modifiers);
+                        ClassOrInterfaceDeclaration();
                         break;
                     case ENUM:
-                        EnumDeclaration(modifiers);
+                        EnumDeclaration();
                         break;
                     case AT:
-                        AnnotationTypeDeclaration(modifiers);
+                        AnnotationTypeDeclaration();
                         break;
                     default:
                         jj_consume_token(-1);
@@ -549,7 +536,7 @@ public class JavaParser15 implements JavaParserInterface {
         }
     }
 
-    final public void ClassOrInterfaceDeclaration(int modifiers) throws ParseException {
+    final public void ClassOrInterfaceDeclaration() throws ParseException {
         boolean isInterface = false;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case CLASS:
@@ -602,7 +589,7 @@ public class JavaParser15 implements JavaParserInterface {
             extendsMoreThanOne = true;
         }
         if (extendsMoreThanOne && !isInterface) {
-            if (true) throw new ParseException("A class cannot extend more than one other class");
+            throw new ParseException("A class cannot extend more than one other class");
         }
     }
 
@@ -621,11 +608,11 @@ public class JavaParser15 implements JavaParserInterface {
             ClassOrInterfaceType();
         }
         if (isInterface) {
-            if (true) throw new ParseException("An interface cannot implement other interfaces");
+            throw new ParseException("An interface cannot implement other interfaces");
         }
     }
 
-    final public void EnumDeclaration(int modifiers) throws ParseException {
+    final public void EnumDeclaration() throws ParseException {
         jj_consume_token(ENUM);
         jj_consume_token(IDENTIFIER);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
@@ -654,11 +641,7 @@ public class JavaParser15 implements JavaParserInterface {
             case IDENTIFIER:
             case AT:
                 EnumConstant();
-                label_8:
-                while (true) {
-                    if (!jj_2_3(2)) {
-                        break label_8;
-                    }
+                while (!jj_2_3(2)) {
                     jj_consume_token(COMMA);
                     EnumConstant();
                 }
@@ -821,11 +804,10 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ClassOrInterfaceBodyDeclaration(boolean isInterface) throws ParseException {
 //        boolean isNestedInterface = false;
-        int modifiers;
         if (jj_2_6(2)) {
             Initializer();
             if (isInterface) {
-                if (true) throw new ParseException("An interface cannot have initializers");
+                throw new ParseException("An interface cannot have initializers");
             }
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
@@ -855,20 +837,19 @@ public class JavaParser15 implements JavaParserInterface {
                 case IDENTIFIER:
                 case AT:
                 case LT:
-                    modifiers = Modifiers();
                     switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                         case CLASS:
                         case INTERFACE:
-                            ClassOrInterfaceDeclaration(modifiers);
+                            ClassOrInterfaceDeclaration();
                             break;
                         case ENUM:
-                            EnumDeclaration(modifiers);
+                            EnumDeclaration();
                             break;
                         default:
                             if (jj_2_4(2147483647)) {
                                 ConstructorDeclaration();
                             } else if (jj_2_5(2147483647)) {
-                                FieldDeclaration(modifiers);
+                                FieldDeclaration();
                             } else {
                                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                                     case BOOLEAN:
@@ -882,7 +863,7 @@ public class JavaParser15 implements JavaParserInterface {
                                     case VOID:
                                     case IDENTIFIER:
                                     case LT:
-                                        MethodDeclaration(modifiers);
+                                        MethodDeclaration();
                                         break;
                                     default:
                                         jj_consume_token(-1);
@@ -901,7 +882,7 @@ public class JavaParser15 implements JavaParserInterface {
         }
     }
 
-    final public void FieldDeclaration(int modifiers) throws ParseException {
+    final public void FieldDeclaration() throws ParseException {
         Type();
         VariableDeclarator();
         label_13:
@@ -1016,11 +997,7 @@ public class JavaParser15 implements JavaParserInterface {
             case PLUS:
             case MINUS:
                 VariableInitializer();
-                label_15:
-                while (true) {
-                    if (!jj_2_7(2)) {
-                        break label_15;
-                    }
+                while (!jj_2_7(2)) {
                     jj_consume_token(COMMA);
                     VariableInitializer();
                 }
@@ -1036,7 +1013,7 @@ public class JavaParser15 implements JavaParserInterface {
         jj_consume_token(RBRACE);
     }
 
-    final public void MethodDeclaration(int modifiers) throws ParseException {
+    final public void MethodDeclaration() throws ParseException {
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case LT:
                 TypeParameters();
@@ -1300,22 +1277,15 @@ public class JavaParser15 implements JavaParserInterface {
             case LONG:
             case SHORT:
                 PrimitiveType();
-                label_20:
-                while (true) {
+                do {
                     jj_consume_token(LBRACKET);
                     jj_consume_token(RBRACKET);
-                    if (!jj_2_11(2)) {
-                        break label_20;
-                    }
                 }
+                while (jj_2_11(2));
                 break;
             case IDENTIFIER:
                 ClassOrInterfaceType();
-                label_21:
-                while (true) {
-                    if (!jj_2_12(2)) {
-                        break label_21;
-                    }
+                while (!jj_2_12(2)) {
                     jj_consume_token(LBRACKET);
                     jj_consume_token(RBRACKET);
                 }
@@ -1331,11 +1301,7 @@ public class JavaParser15 implements JavaParserInterface {
         if (jj_2_13(2)) {
             TypeArguments();
         }
-        label_22:
-        while (true) {
-            if (!jj_2_14(2)) {
-                break label_22;
-            }
+        while (!jj_2_14(2)) {
             jj_consume_token(DOT);
             jj_consume_token(IDENTIFIER);
             if (jj_2_15(2)) {
@@ -1462,11 +1428,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void Name() throws ParseException {
         jj_consume_token(IDENTIFIER);
-        label_24:
-        while (true) {
-            if (!jj_2_16(2)) {
-                break label_24;
-            }
+        while (!jj_2_16(2)) {
             jj_consume_token(DOT);
             jj_consume_token(IDENTIFIER);
         }
@@ -1703,11 +1665,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ShiftExpression() throws ParseException {
         AdditiveExpression();
-        label_33:
-        while (true) {
-            if (!jj_2_18(1)) {
-                break label_33;
-            }
+        while (!jj_2_18(1)) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                 case LSHIFT:
                     jj_consume_token(LSHIFT);
@@ -2004,11 +1962,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void PrimaryExpression() throws ParseException {
         PrimaryPrefix();
-        label_36:
-        while (true) {
-            if (!jj_2_25(2)) {
-                break label_36;
-            }
+        while (!jj_2_25(2)) {
             PrimarySuffix();
         }
     }
@@ -2256,37 +2210,24 @@ public class JavaParser15 implements JavaParserInterface {
  */
     final public void ArrayDimsAndInits() throws ParseException {
         if (jj_2_35(2)) {
-            label_39:
-            while (true) {
+            do {
                 jj_consume_token(LBRACKET);
                 Expression();
                 jj_consume_token(RBRACKET);
-                if (!jj_2_33(2)) {
-                    break label_39;
-                }
             }
-            label_40:
-            while (true) {
-                if (!jj_2_34(2)) {
-                    break label_40;
-                }
+            while (!jj_2_33(2));
+            while (!jj_2_34(2)) {
                 jj_consume_token(LBRACKET);
                 jj_consume_token(RBRACKET);
             }
         } else {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                 case LBRACKET:
-                    label_41:
-                    while (true) {
+                    do {
                         jj_consume_token(LBRACKET);
                         jj_consume_token(RBRACKET);
-                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                            case LBRACKET:
-                                break;
-                            default:
-                                break label_41;
-                        }
                     }
+                    while(((jj_ntk == -1) ? jj_ntk() : jj_ntk) == LBRACKET);
                     ArrayInitializer();
                     break;
                 default:
@@ -2509,7 +2450,7 @@ public class JavaParser15 implements JavaParserInterface {
                     break;
                 case CLASS:
                 case INTERFACE:
-                    ClassOrInterfaceDeclaration(0);
+                    ClassOrInterfaceDeclaration();
                     break;
                 default:
                     jj_consume_token(-1);
@@ -3202,11 +3143,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void MemberValueArrayInitializer() throws ParseException {
         jj_consume_token(LBRACE);
         MemberValue();
-        label_49:
-        while (true) {
-            if (!jj_2_42(2)) {
-                break label_49;
-            }
+        while (!jj_2_42(2)) {
             jj_consume_token(COMMA);
             MemberValue();
         }
@@ -3220,7 +3157,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     /* Annotation Types. */
-    final public void AnnotationTypeDeclaration(int modifiers) throws ParseException {
+    final public void AnnotationTypeDeclaration() throws ParseException {
         jj_consume_token(AT);
         jj_consume_token(INTERFACE);
         jj_consume_token(IDENTIFIER);
@@ -3267,7 +3204,6 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void AnnotationTypeMemberDeclaration() throws ParseException {
-        int modifiers;
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case ABSTRACT:
             case BOOLEAN:
@@ -3293,7 +3229,6 @@ public class JavaParser15 implements JavaParserInterface {
             case VOLATILE:
             case IDENTIFIER:
             case AT:
-                modifiers = Modifiers();
                 if (jj_2_43(2147483647)) {
                     Type();
                     jj_consume_token(IDENTIFIER);
@@ -3310,13 +3245,13 @@ public class JavaParser15 implements JavaParserInterface {
                     switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                         case CLASS:
                         case INTERFACE:
-                            ClassOrInterfaceDeclaration(modifiers);
+                            ClassOrInterfaceDeclaration();
                             break;
                         case ENUM:
-                            EnumDeclaration(modifiers);
+                            EnumDeclaration();
                             break;
                         case AT:
-                            AnnotationTypeDeclaration(modifiers);
+                            AnnotationTypeDeclaration();
                             break;
                         case BOOLEAN:
                         case BYTE:
@@ -3327,7 +3262,7 @@ public class JavaParser15 implements JavaParserInterface {
                         case LONG:
                         case SHORT:
                         case IDENTIFIER:
-                            FieldDeclaration(modifiers);
+                            FieldDeclaration();
                             break;
                         default:
                             jj_consume_token(-1);
