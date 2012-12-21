@@ -193,6 +193,7 @@ public class SourceFileData extends CoverageDataContainer<ClassData>
                 ".");
     }
 
+    @Override
     public int hashCode() {
         return this.name.hashCode();
     }

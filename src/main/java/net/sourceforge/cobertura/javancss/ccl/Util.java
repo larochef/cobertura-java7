@@ -41,20 +41,18 @@ import java.util.Vector;
 
 /**
  * A general purpose class with a variety of support and convenience methods.
- *
+ * <p/>
  * <p> There are different groups of methods in this class:
  * <br>
  * <br><a href="#print(char)">print methods</a> - convenience methods for System.out.print etc. that additionally make sure output is gets flushed immediately.
  * <br><a href="#isEmpty(java.lang.String)">string methods</a>
  * <br><a href="#concat(java.util.Vector)">string/vector converter methods</a>
  * <br><a href="#getConstantObject()">miscellaneous methods</a>
- * <p>
- *
+ * <p/>
+ * <p/>
  * Some basic but none the less the most used methods by myself are:<br>
  * - {@link #isEmpty(java.lang.String) isEmpty}<br>
- * - {@link #stringToLines(java.lang.String) stringToLines}<br>
- * - {@link #sleep(int) sleep}<br>
- * <p>
+ * <p/>
  *
  * @author <a href="http://www.kclee.com/clemens/">
  *         Chr. Clemens Lee</a>
@@ -73,8 +71,6 @@ import java.util.Vector;
 
 public final class Util {
 
-    public static final Object CONSTANT_OBJECT = new Object();
-
     /**
      * This is an utility class, there is (should be) no need
      * for an instance of this class.
@@ -86,6 +82,7 @@ public final class Util {
     // -----------------------------------------------------
     // debug methods and assertion stuff
     // -----------------------------------------------------
+
     /**
      * panicIf <=> not assert. Throws ApplicationException if true.
      * It's not necessary to catch this exception.
@@ -97,174 +94,58 @@ public final class Util {
     }
 
     /**
-     * panicIf <=> not assert. Throws ApplicationException if true.
-     * It's not necessary to catch this exception.
-     *
-     * @param sMessage_ The error message for the Exception.
-     */
-    public static void panicIf(boolean bPanic_, String sMessage_) {
-        if (bPanic_) {
-            throw (new RuntimeException(sMessage_));
-        }
-    }
-
-    /**
      * Tests, if a given String equals null or "".
      */
     public static boolean isEmpty(String sTest_) {
-        if (sTest_ == null || sTest_.equals("")) {
-            return true;
-        }
-
-        return false;
+        return sTest_ == null || "".equals(sTest_);
     }
 
-    /**
-     * This function takes a String and separates it into different
-     * lines. The last line does not need to have a separator character.
-     *
-     * @param lines_   The number of lines that should be extracted.
-     *                 Zero if maximum number of lines is requested.
-     * @param cCutter_ The character that separates pString_ into
-     *                 different lines
-     *
-     * @return         The single lines do not contain the cCutter_
-     *                 character at the end.
-     */
-    private static Vector stringToLines(int lines_, String pString_, char cCutter_) {
-        int maxLines = Integer.MAX_VALUE;
-        if (lines_ > 0) {
-            maxLines = lines_;
-        }
-
-        Vector vRetVal = new Vector();
-        if (pString_ == null) {
-            return vRetVal;
-        }
-
-        int startIndex = 0;
-        for (; maxLines > 0; maxLines--) {
-            int endIndex = pString_.indexOf(cCutter_, startIndex);
-            if (endIndex == -1) {
-                if (startIndex < pString_.length()) {
-                    endIndex = pString_.length();
-                }
-                else {
-                    break;
-                }
-            }
-            String sLine = pString_.substring(startIndex, endIndex);
-            vRetVal.addElement(sLine);
-            startIndex = endIndex + 1;
-        }
-
-        return vRetVal;
-    }
-
-    /**
-     * This function takes a String and separates it into different
-     * lines. The last line does not need to have a separator character.
-     *
-     * @param cCutter_ The character that separates pString_ into
-     *                 different lines
-     *
-     * @return The single lines do not contain the cCutter_ character
-     *         at the end.
-     */
-    public static Vector stringToLines(String pString_, char cCutter_) {
-        return stringToLines(0, pString_, cCutter_);
-    }
-
-    /**
-     * This function takes a String and separates it into different
-     * lines. The last line does not need to have a '\n'. The function
-     * can't handle dos carriage returns.
-     *
-     * @return The single lines do not contain the '\n' character
-     *         at the end.
-     */
-    public static Vector stringToLines(String pString_) {
-        return stringToLines(pString_, '\n');
-    }
-
-    /**
-     * Current thread sleeps in seconds.
-     */
-    private static void sleep(int seconds_) {
-        try {
-            Thread.sleep(seconds_ * 1000);
-        }
-        catch (Exception pException) {}
-    }
-
-    public static Vector concat(Vector vFirst_, Vector vSecond_) {
-        //cobertura Mark Doliner appears to have simplified this.
-        vFirst_.addAll(vSecond_);
-        return vFirst_;
-    }
-
-
-    public static Vector<Object> sort(Vector<Object> input)
-    {
+    public static Vector<Object> sort(Vector<Object> input) {
         //cobertura - apparently Mark Doliner didn't think we need to sort.
         return input;
     }
 
     // cobertura - gotten from decompile of ccl.jar.
-    public static void debug(Object oMessage_)
-    {
-        if(_bDebug)
+    public static void debug(Object oMessage_) {
+        if (_bDebug)
             printlnErr(oMessage_.toString());
     }
 
-
-    public static Object getConstantObject()
-    {
-        return CONSTANT_OBJECT;
-    }
-
     // cobertura - gotten from decompile of ccl.jar.
-    public static void setDebug(boolean bDebug_)
-    {
+    public static void setDebug(boolean bDebug_) {
         _bDebug = bDebug_;
     }
 
     // cobertura = gotten from decompile of ccl.jar.
-    public static boolean isDebug()
-    {
+    public static boolean isDebug() {
         return _bDebug;
     }
 
     // cobertura = gotten from decompile of ccl.jar.
-    public static void println(String pString_)
-    {
+    public static void println(String pString_) {
         System.out.println(pString_);
         System.out.flush();
     }
 
     // cobertura = gotten from decompile of ccl.jar.
-    public static void printErr(char c_)
-    {
+    public static void printErr(char c_) {
         System.err.print(c_);
         System.err.flush();
     }
 
     // cobertura = gotten from decompile of ccl.jar.
-    public static void printErr(String pString_)
-    {
+    public static void printErr(String pString_) {
         System.err.print(pString_);
         System.err.flush();
     }
 
     // cobertura = gotten from decompile of ccl.jar.
-    public static void printlnErr()
-    {
+    public static void printlnErr() {
         printErr('\n');
     }
 
     // cobertura = gotten from decompile of ccl.jar.
-    public static void printlnErr(String sMessage_)
-    {
+    public static void printlnErr(String sMessage_) {
         printErr(sMessage_);
         printlnErr();
     }
