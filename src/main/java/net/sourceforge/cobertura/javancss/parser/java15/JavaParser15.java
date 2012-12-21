@@ -512,10 +512,13 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void TypeParameters() throws ParseException {
         jj_consume_token(LT);
-        TypeParameter();
-        while (((jj_ntk == -1) ? jj_ntk() : jj_ntk) == COMMA) {
-            jj_consume_token(COMMA);
+        // Add support for diamond operator
+        if(((jj_ntk == -1) ? jj_ntk() : jj_ntk) != GT) {
             TypeParameter();
+            while (((jj_ntk == -1) ? jj_ntk() : jj_ntk) == COMMA) {
+                jj_consume_token(COMMA);
+                TypeParameter();
+            }
         }
         jj_consume_token(GT);
     }
