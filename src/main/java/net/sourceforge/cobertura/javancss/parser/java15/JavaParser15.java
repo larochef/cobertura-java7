@@ -107,72 +107,7 @@ public class JavaParser15 implements JavaParserInterface {
         public static final int TRANSIENT = 0x0100;
         public static final int VOLATILE = 0x0200;
         public static final int STRICTFP = 0x1000;
-
-        /**
-         * A set of accessors that indicate whether the specified modifier
-         * is in the set.
-         */
-
-//        public boolean isPublic(int modifiers) {
-//            return (modifiers & PUBLIC) != 0;
-//        }
-//
-//        public boolean isProtected(int modifiers) {
-//            return (modifiers & PROTECTED) != 0;
-//        }
-//
-//        public boolean isPrivate(int modifiers) {
-//            return (modifiers & PRIVATE) != 0;
-//        }
-//
-//        public boolean isStatic(int modifiers) {
-//            return (modifiers & STATIC) != 0;
-//        }
-//
-//        public boolean isAbstract(int modifiers) {
-//            return (modifiers & ABSTRACT) != 0;
-//        }
-//
-//        public boolean isFinal(int modifiers) {
-//            return (modifiers & FINAL) != 0;
-//        }
-//
-//        public boolean isNative(int modifiers) {
-//            return (modifiers & NATIVE) != 0;
-//        }
-//
-//        public boolean isStrictfp(int modifiers) {
-//            return (modifiers & STRICTFP) != 0;
-//        }
-//
-//        public boolean isSynchronized(int modifiers) {
-//            return (modifiers & SYNCHRONIZED) != 0;
-//        }
-//
-//        public boolean isTransient(int modifiers) {
-//            return (modifiers & TRANSIENT) != 0;
-//        }
-//
-//        public boolean isVolatile(int modifiers) {
-//            return (modifiers & VOLATILE) != 0;
-//        }
-//
-//        /**
-//         * Removes the given modifier.
-//         */
-//        static int removeModifier(int modifiers, int mod) {
-//            return modifiers & ~mod;
-//        }
     }
-
-//    public JavaParser15(String fileName) {
-//        this(System.in);
-//        try {
-//            ReInit(new FileInputStream(new File(fileName)));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     public static void main(String args[]) {
         JavaParser15 parser;
@@ -216,18 +151,11 @@ public class JavaParser15 implements JavaParserInterface {
         if (jj_2_1(2147483647)) {
             PackageDeclaration();
         }
-        label_1:
-        while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case IMPORT:
-                    break;
-                default:
-                    break label_1;
-            }
+        while (((jj_ntk == -1) ? jj_ntk() : jj_ntk) == IMPORT) {
             ImportDeclaration();
         }
-        label_2:
-        while (true) {
+        boolean stop = false;
+        while (!stop) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                 case ABSTRACT:
                 case CLASS:
@@ -247,7 +175,7 @@ public class JavaParser15 implements JavaParserInterface {
                 case AT:
                     break;
                 default:
-                    break label_2;
+                    stop = true;
             }
             TypeDeclaration();
         }
