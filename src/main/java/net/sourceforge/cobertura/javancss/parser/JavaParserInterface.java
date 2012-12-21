@@ -39,6 +39,10 @@
  */
 package net.sourceforge.cobertura.javancss.parser;
 
+import net.sourceforge.cobertura.javancss.FunctionMetric;
+import net.sourceforge.cobertura.javancss.ObjectMetric;
+import net.sourceforge.cobertura.javancss.PackageMetric;
+
 import java.util.*;
 
 public interface JavaParserInterface
@@ -57,17 +61,17 @@ public interface JavaParserInterface
       return _topLevelClasses;
       }*/
     
-    public List/*<FunctionMetric>*/ getFunction();
+    public List<FunctionMetric> getFunction();
     
     /**
      * @return Top level classes in sorted order
      */
-    public List/*<ObjectMetric>*/ getObject();
+    public List<ObjectMetric> getObject();
     
     /**
      * @return The empty package consists of the name ".".
      */
-    public Map/*<String,PackageMetric>*/ getPackage();
+    public Map<String, PackageMetric> getPackage();
     
     public List getImports();
 
