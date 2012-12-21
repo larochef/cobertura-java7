@@ -45,18 +45,15 @@ package net.sourceforge.cobertura.javancss;
  * @author  Chr. Clemens Lee <clemens@kclee.com>
  * @version $Id: PackageMetric.java 121 2009-01-17 22:19:45Z hboutemy $
  */
-public class PackageMetric extends Metric
-{
+public class PackageMetric extends Metric {
     public int classes    = 0;
     public int functions  = 0;
 
-    public PackageMetric()
-    {
+    public PackageMetric() {
         super();
     }
 
-    public void clear()
-    {
+    public void clear() {
         super.clear();
         classes   = 0;
         functions = 0;

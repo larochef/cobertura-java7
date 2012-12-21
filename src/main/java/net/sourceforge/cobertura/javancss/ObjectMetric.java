@@ -66,20 +66,17 @@ package net.sourceforge.cobertura.javancss;
  * @author  Hervé Boutemy
  * @version $Id: ObjectMetric.java 121 2009-01-17 22:19:45Z hboutemy $
  */
-public class ObjectMetric extends Metric
-{
+public class ObjectMetric extends Metric {
     /** Cyclomatic Complexity Number (McCabe metric) */
     public int ccn = 0;
     public int functions = 0;
     public int classes = 0;
 
-    public ObjectMetric()
-    {
+    public ObjectMetric() {
         super();
     }
 
-    public void clear()
-    {
+    public void clear() {
         super.clear();
         ccn = 0;
         functions = 0;

@@ -66,8 +66,7 @@ package net.sourceforge.cobertura.javancss;
  * @author  Hervé Boutemy
  * @version $Id: Metric.java 121 2009-01-17 22:19:45Z hboutemy $
  */
-public abstract class Metric implements Comparable
-{
+public abstract class Metric implements Comparable<Metric> {
     public String name = ".";
     /** Non Commenting Source Statements (NCSS). */
     public int ncss = 0;
@@ -76,13 +75,11 @@ public abstract class Metric implements Comparable
     public int singleLn = 0;
     public int multiLn = 0;
 
-    public Metric()
-    {
+    public Metric() {
         super();
     }
 
-    public void clear()
-    {
+    public void clear() {
         name = ".";
         ncss = 0;
         javadocs = 0;
@@ -95,18 +92,21 @@ public abstract class Metric implements Comparable
         return name;
     }
 
-    public int compareTo( Object o )
-    {
-        return name.compareTo( ((Metric)o).name );
+    public int compareTo(Metric o) {
+        return name.compareTo(o.name);
     }
 
-    public boolean equals( Object o )
-    {
-        return compareTo( o ) == 0;
+    public boolean equals(Object o ) {
+        if(this == o) {
+            return true;
+        }
+        if(!(o instanceof Metric)) {
+            return false;
+        }
+        return compareTo((Metric)o) == 0;
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         return name.hashCode();
     }
 }
