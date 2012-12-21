@@ -513,14 +513,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void TypeParameters() throws ParseException {
         jj_consume_token(LT);
         TypeParameter();
-        label_10:
-        while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-                case COMMA:
-                    break;
-                default:
-                    break label_10;
-            }
+        while (((jj_ntk == -1) ? jj_ntk() : jj_ntk) == COMMA) {
             jj_consume_token(COMMA);
             TypeParameter();
         }
