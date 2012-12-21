@@ -24,12 +24,6 @@
  */
 package net.sourceforge.cobertura.reporting;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import net.sourceforge.cobertura.coveragedata.ClassData;
 import net.sourceforge.cobertura.coveragedata.PackageData;
 import net.sourceforge.cobertura.coveragedata.ProjectData;
@@ -38,8 +32,13 @@ import net.sourceforge.cobertura.javancss.FunctionMetric;
 import net.sourceforge.cobertura.javancss.Javancss;
 import net.sourceforge.cobertura.util.FileFinder;
 import net.sourceforge.cobertura.util.Source;
-
 import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -86,37 +85,32 @@ public class ComplexityCalculator {
 	 * calculates the average cyclomatic code complexity of all
 	 * methods of all classes in a given directory.  
 	 *
-	 * @param file The input stream for which you want to calculate
+	 * @param sourceFileName The input stream for which you want to calculate
 	 *        the complexity
 	 * @return average complexity for the specified input stream 
 	 */
 	private Complexity getAccumlatedCCNForSource(String sourceFileName, Source source) {
-		if (source == null)
-		{
+		if (source == null) {
 			return ZERO_COMPLEXITY;
 		}
-		if (!sourceFileName.endsWith(".java"))
-		{
+		if (!sourceFileName.endsWith(".java")) {
 			return ZERO_COMPLEXITY;
 		}
 		Javancss javancss = new Javancss(source.getInputStream());
 
-		if (javancss.getLastErrorMessage() != null)
-		{
+		if (javancss.getLastErrorMessage() != null) {
 			//there is an error while parsing the java file. log it
 			logger.warn("JavaNCSS got an error while parsing the java " + source.getOriginDesc() + "\n" 
 						+ javancss.getLastErrorMessage());
 		}
 
-		List methodMetrics = javancss.getFunctionMetrics();
+		List<FunctionMetric> methodMetrics = javancss.getFunctionMetrics();
 		int classCcn = 0;
-        for( Iterator method = methodMetrics.iterator(); method.hasNext();)
-        {
-        	FunctionMetric singleMethodMetrics = (FunctionMetric)method.next();
+        for(FunctionMetric singleMethodMetrics : methodMetrics) {
         	classCcn += singleMethodMetrics.ccn;
         }
 		
-		return new Complexity( classCcn, methodMetrics.size());
+		return new Complexity(classCcn, methodMetrics.size());
 	}
 
  	/**
@@ -125,23 +119,18 @@ public class ComplexityCalculator {
 	 * sometimes referred to as McCabe's number.  This method
 	 * calculates the average cyclomatic code complexity of all
 	 * methods of all classes in a given directory.  
- 	 * @param sourceFileName 
-	 *
-	 * @param file The source file for which you want to calculate
+ 	 * @param sourceFileName source file for which you want to calculate
 	 *        the complexity
 	 * @return average complexity for the specified source file 
  	 * @throws IOException 
 	 */
 	private Complexity getAccumlatedCCNForSingleFile(String sourceFileName) throws IOException {
 		Source source = finder.getSource(sourceFileName);
-		try
-		{
+		try {
 	        return getAccumlatedCCNForSource(sourceFileName, source);
 		}
-		finally
-		{
-			if (source != null)
-			{
+		finally {
+			if (source != null) {
 				source.close();
 			}
 		}
@@ -156,12 +145,11 @@ public class ComplexityCalculator {
 	 * @throws NullPointerException if projectData is null
 	 * @return CCN for project or 0 if no source files were found
 	 */
-	public double getCCNForProject( ProjectData projectData) {
+	public double getCCNForProject(ProjectData projectData) {
 		// Sum complexity for all packages
 		Complexity act = new Complexity();
-		for( Iterator it = projectData.getPackages().iterator(); it.hasNext();) {
-			PackageData packageData = (PackageData)it.next();
-			act.add( getCCNForPackageInternal( packageData));
+		for(PackageData packageData : projectData.getPackages()) {
+			act.add(getCCNForPackageInternal(packageData));
 		}
 
 		// Return average CCN for source files

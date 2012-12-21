@@ -40,11 +40,9 @@ package net.sourceforge.cobertura.javancss.ccl;
 import java.util.Hashtable;
 
 //cobertura - most of this class was removed - unused for the most part.
-public class Init
-{
+public class Init {
 
-    public Hashtable getOptions()
-    {
+    public Hashtable getOptions() {
         return null;
     }
 

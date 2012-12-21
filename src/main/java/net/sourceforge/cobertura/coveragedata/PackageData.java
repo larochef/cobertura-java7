@@ -24,15 +24,13 @@
 package net.sourceforge.cobertura.coveragedata;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class PackageData extends CoverageDataContainer
-		implements Comparable, HasBeenInstrumented
-{
+public class PackageData extends CoverageDataContainer<ClassData>
+		implements Comparable, HasBeenInstrumented {
 
 	private static final long serialVersionUID = 7;
 
@@ -114,58 +112,42 @@ public class PackageData extends CoverageDataContainer
 		}
 	}
 
-	public SortedSet getClasses()
-	{
+	public SortedSet<ClassData> getClasses() {
 		lock.lock();
-		try
-		{
-			return new TreeSet(this.children.values());
+		try {
+			return new TreeSet<ClassData>(this.children.values());
 		}
-		finally
-		{
+		finally {
 			lock.unlock();
 		}
 	}
 
-	public String getName()
-	{
+	public String getName() {
 		return this.name;
 	}
 
-	public String getSourceFileName()
-	{
-		return this.name.replace('.', '/');
-	}
-
-	public Collection getSourceFiles()
-	{
-		SortedMap sourceFileDatas = new TreeMap();
+	public Collection<SourceFileData> getSourceFiles() {
+		SortedMap<String, SourceFileData> sourceFileDatas = new TreeMap<String, SourceFileData>();
 		
 		lock.lock();
-		try
-		{
-			Iterator iter = this.children.values().iterator();
-			while (iter.hasNext()) {
-				ClassData classData = (ClassData)iter.next();
+		try {
+            for(ClassData classData : this.children.values()) {
 				String sourceFileName = classData.getSourceFileName();
-				SourceFileData sourceFileData = (SourceFileData)sourceFileDatas.get(sourceFileName);
-				if (sourceFileData == null)
-				{
+				SourceFileData sourceFileData = sourceFileDatas.get(sourceFileName);
+				if (sourceFileData == null) {
 					sourceFileData = new SourceFileData(sourceFileName);
 					sourceFileDatas.put(sourceFileName, sourceFileData);
 				}
 				sourceFileData.addClassData(classData);
 			}
 		}
-		finally
-		{
+		finally {
 			lock.unlock();
 		}
 		return sourceFileDatas.values();
 	}
 
-	public int hashCode()
-	{
+	public int hashCode() {
 		return this.name.hashCode();
 	}
 

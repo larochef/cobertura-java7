@@ -40,7 +40,6 @@
 
 package net.sourceforge.cobertura.javancss;
 
-import net.sourceforge.cobertura.javancss.ccl.Exitable;
 import net.sourceforge.cobertura.javancss.ccl.Init;
 import net.sourceforge.cobertura.javancss.ccl.Util;
 import net.sourceforge.cobertura.javancss.parser.JavaParser;
@@ -75,7 +74,7 @@ import java.util.Map;
  *            , and Guillermo Rodriguez <guille@sms.nl>.
  * @version   $Id: Javancss.java 676 2009-09-04 13:42:13Z lewijw $
  */
-public class Javancss implements Exitable {
+public class Javancss {
 
     private List<File> _vJavaSourceFiles = null;
     private String encoding = null;
@@ -115,15 +114,19 @@ public class Javancss implements Exitable {
      * make sure _vJavaSourceFiles is null.   _measureRoot will
      * use the input stream if it is null.
      */
-    public Javancss(InputStream isJavaSource_) throws UnsupportedEncodingException {
+    public Javancss(InputStream isJavaSource_) {
         this(newReader(isJavaSource_, null));
     }
 
-    private static Reader newReader(InputStream stream, String encoding) throws UnsupportedEncodingException {
-        return (encoding == null) ? new InputStreamReader(stream) : new InputStreamReader(stream, encoding);
+    private static Reader newReader(InputStream stream, String encoding) {
+        try {
+            return (encoding == null) ? new InputStreamReader(stream) : new InputStreamReader(stream, encoding);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException("Supplied encoding not supported : " + encoding, e);
+        }
     }
 
-    private static Reader newReader(File file, String encoding) throws FileNotFoundException, UnsupportedEncodingException {
+    private static Reader newReader(File file, String encoding) throws FileNotFoundException {
         return newReader(new FileInputStream(file), encoding);
     }
 
@@ -149,7 +152,7 @@ public class Javancss implements Exitable {
         String sTempErrorMessage = _sErrorMessage;
         try  {
             // the same method but with a Reader
-            _measureSource( reader );
+            _measureSource(reader);
         }
         catch ( Exception pParseException ) {
             if ( sTempErrorMessage == null ) {
@@ -177,7 +180,7 @@ public class Javancss implements Exitable {
     }
 
     private void _measureSource( Reader reader ) throws Exception {
-        Util.debug( "_measureSource(Reader).ENTER" );
+        Util.debug("_measureSource(Reader).ENTER");
         //Util.debug( "_measureSource(Reader).parser15: -->" + (_pInit.getOptions().get( "parser15" ) + "<--" );
         //Util.panicIf( _pInit == null );
         //Util.panicIf( _pInit.getOptions() == null );
@@ -295,5 +298,4 @@ public class Javancss implements Exitable {
         return _sErrorMessage;
     }
 
-    public void setExit() {}
 }
