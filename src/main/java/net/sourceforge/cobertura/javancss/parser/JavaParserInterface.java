@@ -45,8 +45,7 @@ import net.sourceforge.cobertura.javancss.PackageMetric;
 
 import java.util.*;
 
-public interface JavaParserInterface
-{
+public interface JavaParserInterface {
     public void parse() throws Exception;
     public void parseImportUnit() throws Exception;
 
