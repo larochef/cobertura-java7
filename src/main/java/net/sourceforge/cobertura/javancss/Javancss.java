@@ -79,30 +79,66 @@ public class Javancss implements Exitable {
 
     private List<File> _vJavaSourceFiles = null;
     private String encoding = null;
-
     private String _sErrorMessage = null;
-
     private JavaParserInterface _pJavaParser = null;
     private List<FunctionMetric> _vFunctionMetrics = new ArrayList<FunctionMetric>();
     private Map<String,PackageMetric> _htPackages = null;
     private Object[] _aoPackage = null;
+    private Init _pInit = null;
 
-    private void _measureSource( File sSourceFile_ ) throws Exception
-    {
+    /*
+     * cobertura:  add this next constructor so any input stream can be used.
+     *
+     * It should be a copy of the Javancss(String) constructor, but just
+     * make sure _vJavaSourceFiles is null.   _measureRoot will
+     * use the input stream if it is null.
+     */
+    public Javancss(Reader reader) {
+        _sErrorMessage = null;
+        _vJavaSourceFiles = null;
+
+        try {
+            _measureRoot(reader);
+        } catch(Exception e) {
+            Util.debug( "Javancss.<init>(InputStream).e: " + e );
+            e.printStackTrace();
+        } catch(TokenMgrError pError) {
+            Util.debug( "Javancss.<init>(InputStream).pError: " + pError );
+            pError.printStackTrace();
+        }
+    }
+
+    /*
+     * cobertura:  add this next constructor so any input stream can be used.
+     *
+     * It should be a copy of the Javancss(String) constructor, but just
+     * make sure _vJavaSourceFiles is null.   _measureRoot will
+     * use the input stream if it is null.
+     */
+    public Javancss(InputStream isJavaSource_) throws UnsupportedEncodingException {
+        this(newReader(isJavaSource_, null));
+    }
+
+    private static Reader newReader(InputStream stream, String encoding) throws UnsupportedEncodingException {
+        return (encoding == null) ? new InputStreamReader(stream) : new InputStreamReader(stream, encoding);
+    }
+
+    private static Reader newReader(File file, String encoding) throws FileNotFoundException, UnsupportedEncodingException {
+        return newReader(new FileInputStream(file), encoding);
+    }
+
+    private void _measureSource( File sSourceFile_ ) throws Exception {
         Reader reader;
 
         // opens the file
         try {
             reader = newReader(sSourceFile_, this.encoding);
         }
-        catch ( IOException pIOException )
-        {
-            if ( Util.isEmpty( _sErrorMessage ) )
-            {
+        catch ( IOException pIOException ) {
+            if ( Util.isEmpty( _sErrorMessage ) ) {
                 _sErrorMessage = "";
             }
-            else
-            {
+            else {
                 _sErrorMessage += "\n";
             }
             _sErrorMessage += "File not found: " + sSourceFile_.getAbsolutePath();
@@ -111,68 +147,63 @@ public class Javancss implements Exitable {
         }
 
         String sTempErrorMessage = _sErrorMessage;
-        try
-        {
+        try  {
             // the same method but with a Reader
             _measureSource( reader );
         }
-        catch ( Exception pParseException )
-        {
-            if ( sTempErrorMessage == null )
-            {
+        catch ( Exception pParseException ) {
+            if ( sTempErrorMessage == null ) {
                 sTempErrorMessage = "";
             }
             sTempErrorMessage += "ParseException in " + sSourceFile_.getAbsolutePath() +
-                   "\nLast useful checkpoint: \"" + _pJavaParser.getLastFunction() + "\"\n";
+                    "\nLast useful checkpoint: \"" + _pJavaParser.getLastFunction() + "\"\n";
             sTempErrorMessage += pParseException.getMessage() + "\n";
 
             _sErrorMessage = sTempErrorMessage;
 
             throw pParseException;
         }
-        catch ( Error pTokenMgrError )
-        {
+        catch ( Error pTokenMgrError ) {
             if ( sTempErrorMessage == null )
             {
                 sTempErrorMessage = "";
             }
             sTempErrorMessage += "TokenMgrError in " + sSourceFile_.getAbsolutePath() +
-                   "\n" + pTokenMgrError.getMessage() + "\n";
+                    "\n" + pTokenMgrError.getMessage() + "\n";
             _sErrorMessage = sTempErrorMessage;
 
             throw pTokenMgrError;
         }
     }
 
-    private void _measureSource( Reader reader ) throws Exception
-    {
-      Util.debug( "_measureSource(Reader).ENTER" );
-      //Util.debug( "_measureSource(Reader).parser15: -->" + (_pInit.getOptions().get( "parser15" ) + "<--" );
-      //Util.panicIf( _pInit == null );
-      //Util.panicIf( _pInit.getOptions() == null );
-      Util.debug( "_measureSource(Reader).ENTER2" );
-      try
-      {
-        // create a parser object
-        if (!Util.isDebug())
-        {
-          if ( _pInit == null || _pInit.getOptions() == null || _pInit.getOptions().get( "parser15" ) == null ) {
-            Util.debug( "creating JavaParser" );
-            _pJavaParser = new JavaParser(reader);
-          } else {
-            Util.debug( "creating JavaParser15" );
-            _pJavaParser = new JavaParser15(reader);
-          }
-        } else {
-          if ( _pInit == null || _pInit.getOptions() == null || _pInit.getOptions().get( "parser15" ) == null ) {
-            Util.debug( "creating JavaParserDebug" );
-            Util.println( "creating JavaParserDebug" );
-            _pJavaParser = new JavaParserDebug(reader);
-          } else {
-            Util.debug( "creating JavaParser15Debug" );
-            _pJavaParser = new JavaParser15Debug(reader);
-          }
-        }
+    private void _measureSource( Reader reader ) throws Exception {
+        Util.debug( "_measureSource(Reader).ENTER" );
+        //Util.debug( "_measureSource(Reader).parser15: -->" + (_pInit.getOptions().get( "parser15" ) + "<--" );
+        //Util.panicIf( _pInit == null );
+        //Util.panicIf( _pInit.getOptions() == null );
+        Util.debug( "_measureSource(Reader).ENTER2" );
+        try {
+            // create a parser object
+            if (!Util.isDebug()) {
+                if ( _pInit == null || _pInit.getOptions() == null || _pInit.getOptions().get( "parser15" ) == null ) {
+                    Util.debug( "creating JavaParser" );
+                    _pJavaParser = new JavaParser(reader);
+                } else {
+                    Util.debug( "creating JavaParser15" );
+                    _pJavaParser = new JavaParser15(reader);
+                }
+            }
+            else {
+                if ( _pInit == null || _pInit.getOptions() == null || _pInit.getOptions().get( "parser15" ) == null ) {
+                    Util.debug( "creating JavaParserDebug" );
+                    Util.println( "creating JavaParserDebug" );
+                    _pJavaParser = new JavaParserDebug(reader);
+                }
+                else {
+                    Util.debug( "creating JavaParser15Debug" );
+                    _pJavaParser = new JavaParser15Debug(reader);
+                }
+            }
 
             // execute the parser
             _pJavaParser.parse();
@@ -218,7 +249,6 @@ public class Javancss implements Exitable {
     private void _measureFiles(List<File> vJavaSourceFiles) throws IOException, ParseException, TokenMgrError {
         // for each file
         for (File file : vJavaSourceFiles) {
-
             try {
                 _measureSource( file );
             }
@@ -254,42 +284,6 @@ public class Javancss implements Exitable {
         return _aoPackage;
     }
 
-
-    /*
-     * cobertura:  add this next constructor so any input stream can be used.
-     *
-     * It should be a copy of the Javancss(String) constructor, but just
-     * make sure _vJavaSourceFiles is null.   _measureRoot will
-     * use the input stream if it is null.
-     */
-    public Javancss(Reader reader) {
-        _sErrorMessage = null;
-        _vJavaSourceFiles = null;
-
-        try {
-            _measureRoot(reader);
-        } catch(Exception e) {
-            Util.debug( "Javancss.<init>(InputStream).e: " + e );
-            e.printStackTrace();
-        } catch(TokenMgrError pError) {
-            Util.debug( "Javancss.<init>(InputStream).pError: " + pError );
-            pError.printStackTrace();
-        }
-    }
-
-    /*
-     * cobertura:  add this next constructor so any input stream can be used.
-     * 
-     * It should be a copy of the Javancss(String) constructor, but just
-     * make sure _vJavaSourceFiles is null.   _measureRoot will
-     * use the input stream if it is null.
-     */
-    public Javancss(InputStream isJavaSource_) throws UnsupportedEncodingException {
-        this(newReader(isJavaSource_, null));
-    }
-
-    private Init _pInit = null;
-
     public List getFunctionMetrics() {
         return _vFunctionMetrics;
     }
@@ -302,13 +296,4 @@ public class Javancss implements Exitable {
     }
 
     public void setExit() {}
-
-
-    private static Reader newReader(InputStream stream, String encoding) throws UnsupportedEncodingException {
-        return (encoding == null) ? new InputStreamReader(stream) : new InputStreamReader(stream, encoding);
-    }
-
-    private static Reader newReader(File file, String encoding) throws FileNotFoundException, UnsupportedEncodingException {
-        return newReader(new FileInputStream(file), encoding);
-    }
 }
