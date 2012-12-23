@@ -369,14 +369,7 @@ public class JavaParser15 implements JavaParserInterface {
         boolean extendsMoreThanOne = false;
         jj_consume_token(EXTENDS);
         ClassOrInterfaceType();
-        label_6:
-        while (true) {
-            switch (currentTokenType()) {
-                case COMMA:
-                    break;
-                default:
-                    break label_6;
-            }
+        while (currentTokenType() == COMMA) {
             jj_consume_token(COMMA);
             ClassOrInterfaceType();
             extendsMoreThanOne = true;
@@ -389,14 +382,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void ImplementsList(boolean isInterface) throws ParseException {
         jj_consume_token(IMPLEMENTS);
         ClassOrInterfaceType();
-        label_7:
-        while (true) {
-            switch (currentTokenType()) {
-                case COMMA:
-                    break;
-                default:
-                    break label_7;
-            }
+        while (currentTokenType() == COMMA) {
             jj_consume_token(COMMA);
             ClassOrInterfaceType();
         }
@@ -536,14 +522,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void TypeBound() throws ParseException {
         jj_consume_token(EXTENDS);
         ClassOrInterfaceType();
-        label_11:
-        while (true) {
-            switch (currentTokenType()) {
-                case BIT_AND:
-                    break;
-                default:
-                    break label_11;
-            }
+        while (currentTokenType() == BIT_AND) {
             jj_consume_token(BIT_AND);
             ClassOrInterfaceType();
         }
@@ -551,8 +530,8 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ClassOrInterfaceBody(boolean isInterface) throws ParseException {
         jj_consume_token(LBRACE);
-        label_12:
-        while (true) {
+        boolean shouldContinue = true;
+        while (shouldContinue) {
             switch (currentTokenType()) {
                 case ABSTRACT:
                 case BOOLEAN:
@@ -584,9 +563,11 @@ public class JavaParser15 implements JavaParserInterface {
                 case LT:
                     break;
                 default:
-                    break label_12;
+                    shouldContinue = false;
             }
-            ClassOrInterfaceBodyDeclaration(isInterface);
+            if(shouldContinue) {
+                ClassOrInterfaceBodyDeclaration(isInterface);
+            }
         }
         jj_consume_token(RBRACE);
     }
@@ -674,14 +655,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void FieldDeclaration() throws ParseException {
         Type();
         VariableDeclarator();
-        label_13:
-        while (true) {
-            switch (currentTokenType()) {
-                case COMMA:
-                    break;
-                default:
-                    break label_13;
-            }
+        while (currentTokenType() == COMMA) {
             jj_consume_token(COMMA);
             VariableDeclarator();
         }
@@ -701,14 +675,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void VariableDeclaratorId() throws ParseException {
         jj_consume_token(IDENTIFIER);
-        label_14:
-        while (true) {
-            switch (currentTokenType()) {
-                case LBRACKET:
-                    break;
-                default:
-                    break label_14;
-            }
+        while (currentTokenType() == LBRACKET) {
             jj_consume_token(LBRACKET);
             jj_consume_token(RBRACKET);
         }
@@ -834,14 +801,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void MethodDeclarator() throws ParseException {
         jj_consume_token(IDENTIFIER);
         FormalParameters();
-        label_16:
-        while (true) {
-            switch (currentTokenType()) {
-                case LBRACKET:
-                    break;
-                default:
-                    break label_16;
-            }
+        while (currentTokenType() == LBRACKET) {
             jj_consume_token(LBRACKET);
             jj_consume_token(RBRACKET);
         }
@@ -872,14 +832,7 @@ public class JavaParser15 implements JavaParserInterface {
             case IDENTIFIER:
             case AT:
                 FormalParameter();
-                label_17:
-                while (true) {
-                    switch (currentTokenType()) {
-                        case COMMA:
-                            break;
-                        default:
-                            break label_17;
-                    }
+                while (currentTokenType() == COMMA) {
                     jj_consume_token(COMMA);
                     FormalParameter();
                 }
@@ -984,14 +937,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void ExplicitConstructorInvocation() throws ParseException {
-        label_19:
-        while (true) {
-            switch (currentTokenType()) {
-                case IDENTIFIER:
-                    break;
-                default:
-                    break label_19;
-            }
+        while (currentTokenType() == IDENTIFIER) {
             jj_consume_token(IDENTIFIER);
             jj_consume_token(DOT);
         }
@@ -1102,14 +1048,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void TypeArguments() throws ParseException {
         jj_consume_token(LT);
         TypeArgument();
-        label_23:
-        while (true) {
-            switch (currentTokenType()) {
-                case COMMA:
-                    break;
-                default:
-                    break label_23;
-            }
+        while (currentTokenType() == COMMA) {
             jj_consume_token(COMMA);
             TypeArgument();
         }
@@ -1225,14 +1164,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void NameList() throws ParseException {
         Name();
-        label_25:
-        while (true) {
-            switch (currentTokenType()) {
-                case COMMA:
-                    break;
-                default:
-                    break label_25;
-            }
+        while (currentTokenType() == COMMA) {
             jj_consume_token(COMMA);
             Name();
         }
@@ -1308,14 +1240,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ConditionalOrExpression() throws ParseException {
         ConditionalAndExpression();
-        label_26:
-        while (true) {
-            switch (currentTokenType()) {
-                case SC_OR:
-                    break;
-                default:
-                    break label_26;
-            }
+        while (currentTokenType() == SC_OR) {
             jj_consume_token(SC_OR);
             ConditionalAndExpression();
         }
@@ -1323,14 +1248,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ConditionalAndExpression() throws ParseException {
         InclusiveOrExpression();
-        label_27:
-        while (true) {
-            switch (currentTokenType()) {
-                case SC_AND:
-                    break;
-                default:
-                    break label_27;
-            }
+        while (currentTokenType() == SC_AND) {
             jj_consume_token(SC_AND);
             InclusiveOrExpression();
         }
@@ -1338,14 +1256,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void InclusiveOrExpression() throws ParseException {
         ExclusiveOrExpression();
-        label_28:
-        while (true) {
-            switch (currentTokenType()) {
-                case BIT_OR:
-                    break;
-                default:
-                    break label_28;
-            }
+        while (currentTokenType() == BIT_OR) {
             jj_consume_token(BIT_OR);
             ExclusiveOrExpression();
         }
@@ -1353,14 +1264,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ExclusiveOrExpression() throws ParseException {
         AndExpression();
-        label_29:
-        while (true) {
-            switch (currentTokenType()) {
-                case XOR:
-                    break;
-                default:
-                    break label_29;
-            }
+        while (currentTokenType() == XOR) {
             jj_consume_token(XOR);
             AndExpression();
         }
@@ -1368,14 +1272,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void AndExpression() throws ParseException {
         EqualityExpression();
-        label_30:
-        while (true) {
-            switch (currentTokenType()) {
-                case BIT_AND:
-                    break;
-                default:
-                    break label_30;
-            }
+        while (currentTokenType() == BIT_AND) {
             jj_consume_token(BIT_AND);
             EqualityExpression();
         }
@@ -1383,15 +1280,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void EqualityExpression() throws ParseException {
         InstanceOfExpression();
-        label_31:
-        while (true) {
-            switch (currentTokenType()) {
-                case EQ:
-                case NE:
-                    break;
-                default:
-                    break label_31;
-            }
+        while (currentTokenType() == EQ || currentTokenType() == NE) {
             switch (currentTokenType()) {
                 case EQ:
                     jj_consume_token(EQ);
@@ -1418,19 +1307,13 @@ public class JavaParser15 implements JavaParserInterface {
         }
     }
 
+    private static boolean isComparison(int tokenType) {
+        return tokenType == LT || tokenType == GT || tokenType == LE || tokenType == GE;
+    }
+
     final public void RelationalExpression() throws ParseException {
         ShiftExpression();
-        label_32:
-        while (true) {
-            switch (currentTokenType()) {
-                case LT:
-                case LE:
-                case GE:
-                case GT:
-                    break;
-                default:
-                    break label_32;
-            }
+        while (isComparison(currentTokenType())) {
             switch (currentTokenType()) {
                 case LT:
                     jj_consume_token(LT);
@@ -1475,15 +1358,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void AdditiveExpression() throws ParseException {
         MultiplicativeExpression();
-        label_34:
-        while (true) {
-            switch (currentTokenType()) {
-                case PLUS:
-                case MINUS:
-                    break;
-                default:
-                    break label_34;
-            }
+        while (currentTokenType() == PLUS || currentTokenType() == MINUS) {
             switch (currentTokenType()) {
                 case PLUS:
                     jj_consume_token(PLUS);
@@ -1501,16 +1376,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void MultiplicativeExpression() throws ParseException {
         UnaryExpression();
-        label_35:
-        while (true) {
-            switch (currentTokenType()) {
-                case STAR:
-                case SLASH:
-                case REM:
-                    break;
-                default:
-                    break label_35;
-            }
+        while (currentTokenType() == STAR || currentTokenType() == SLASH || currentTokenType() == REM) {
             switch (currentTokenType()) {
                 case STAR:
                     jj_consume_token(STAR);
@@ -1775,14 +1641,7 @@ public class JavaParser15 implements JavaParserInterface {
                 break;
             default:
                 if (jj_2_26(2147483647)) {
-                    label_37:
-                    while (true) {
-                        switch (currentTokenType()) {
-                            case IDENTIFIER:
-                                break;
-                            default:
-                                break label_37;
-                        }
+                    while (currentTokenType() == IDENTIFIER) {
                         jj_consume_token(IDENTIFIER);
                         jj_consume_token(DOT);
                     }
@@ -1939,14 +1798,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ArgumentList() throws ParseException {
         Expression();
-        label_38:
-        while (true) {
-            switch (currentTokenType()) {
-                case COMMA:
-                    break;
-                default:
-                    break label_38;
-            }
+        while (currentTokenType() == COMMA) {
             jj_consume_token(COMMA);
             Expression();
         }
@@ -2677,14 +2529,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void StatementExpressionList() throws ParseException {
         StatementExpression();
-        label_46:
-        while (true) {
-            switch (currentTokenType()) {
-                case COMMA:
-                    break;
-                default:
-                    break label_46;
-            }
+        while (currentTokenType() == COMMA) {
             jj_consume_token(COMMA);
             StatementExpression();
         }
@@ -2770,14 +2615,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void TryStatement() throws ParseException {
         jj_consume_token(TRY);
         Block();
-        label_47:
-        while (true) {
-            switch (currentTokenType()) {
-                case CATCH:
-                    break;
-                default:
-                    break label_47;
-            }
+        while (currentTokenType() == CATCH) {
             jj_consume_token(CATCH);
             jj_consume_token(LPAREN);
             FormalParameter();
@@ -2867,14 +2705,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void MemberValuePairs() throws ParseException {
         MemberValuePair();
-        label_48:
-        while (true) {
-            switch (currentTokenType()) {
-                case COMMA:
-                    break;
-                default:
-                    break label_48;
-            }
+        while (currentTokenType() == COMMA) {
             jj_consume_token(COMMA);
             MemberValuePair();
         }
