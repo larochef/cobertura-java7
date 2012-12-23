@@ -403,6 +403,42 @@ public class JavaParser15 implements JavaParserInterface {
         EnumBody();
     }
 
+    private static boolean isIdentifier(int type) {
+        switch (type) {
+            case ABSTRACT:
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case CLASS:
+            case DOUBLE:
+            case ENUM:
+            case FINAL:
+            case FLOAT:
+            case INT:
+            case INTERFACE:
+            case LONG:
+            case NATIVE:
+            case PRIVATE:
+            case PROTECTED:
+            case PUBLIC:
+            case SHORT:
+            case STATIC:
+            case STRICTFP:
+            case SYNCHRONIZED:
+            case TRANSIENT:
+            case VOID:
+            case VOLATILE:
+            case IDENTIFIER:
+            case LBRACE:
+            case SEMICOLON:
+            case AT:
+            case LT:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     final public void EnumBody() throws ParseException {
         jj_consume_token(LBRACE);
         switch (currentTokenType()) {
@@ -436,41 +472,7 @@ public class JavaParser15 implements JavaParserInterface {
         switch (currentTokenType()) {
             case SEMICOLON:
                 jj_consume_token(SEMICOLON);
-                label_9:
-                while (true) {
-                    switch (currentTokenType()) {
-                        case ABSTRACT:
-                        case BOOLEAN:
-                        case BYTE:
-                        case CHAR:
-                        case CLASS:
-                        case DOUBLE:
-                        case ENUM:
-                        case FINAL:
-                        case FLOAT:
-                        case INT:
-                        case INTERFACE:
-                        case LONG:
-                        case NATIVE:
-                        case PRIVATE:
-                        case PROTECTED:
-                        case PUBLIC:
-                        case SHORT:
-                        case STATIC:
-                        case STRICTFP:
-                        case SYNCHRONIZED:
-                        case TRANSIENT:
-                        case VOID:
-                        case VOLATILE:
-                        case IDENTIFIER:
-                        case LBRACE:
-                        case SEMICOLON:
-                        case AT:
-                        case LT:
-                            break;
-                        default:
-                            break label_9;
-                    }
+                while (isIdentifier(currentTokenType())) {
                     ClassOrInterfaceBodyDeclaration(false);
                 }
                 break;
@@ -854,6 +856,64 @@ public class JavaParser15 implements JavaParserInterface {
         VariableDeclaratorId();
     }
 
+    private static boolean isKeyword(int type) {
+        switch (type) {
+            case ABSTRACT:
+            case ASSERT:
+            case BOOLEAN:
+            case BREAK:       //
+            case BYTE:
+            case CHAR:
+            case CLASS:
+            case CONTINUE:
+            case DO:
+            case DOUBLE:
+            case FALSE:
+            case FINAL:
+            case FLOAT:
+            case FOR:
+            case IF:
+            case INT:
+            case INTERFACE:
+            case LONG:
+            case NATIVE:
+            case NEW:
+            case NULL:
+            case PRIVATE:
+            case PROTECTED:
+            case PUBLIC:
+            case RETURN:
+            case SHORT:
+            case STATIC:
+            case STRICTFP:
+            case SUPER:
+            case SWITCH:
+            case SYNCHRONIZED:
+            case THIS:
+            case THROW:
+            case TRANSIENT:
+            case TRUE:
+            case TRY:
+            case VOID:
+            case VOLATILE:
+            case WHILE:
+            case INTEGER_LITERAL:
+            case FLOATING_POINT_LITERAL:
+            case CHARACTER_LITERAL:
+            case STRING_LITERAL:
+            case IDENTIFIER:
+            case LPAREN:
+            case LBRACE:
+            case SEMICOLON:
+            case AT:
+            case INCR:
+            case DECR:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     final public void ConstructorDeclaration() throws ParseException {
         switch (currentTokenType()) {
             case LT:
@@ -874,63 +934,7 @@ public class JavaParser15 implements JavaParserInterface {
         if (jj_2_8(2147483647)) {
             ExplicitConstructorInvocation();
         }
-        label_18:
-        while (true) {
-            switch (currentTokenType()) {
-                case ABSTRACT:
-                case ASSERT:
-                case BOOLEAN:
-                case BREAK:
-                case BYTE:
-                case CHAR:
-                case CLASS:
-                case CONTINUE:
-                case DO:
-                case DOUBLE:
-                case FALSE:
-                case FINAL:
-                case FLOAT:
-                case FOR:
-                case IF:
-                case INT:
-                case INTERFACE:
-                case LONG:
-                case NATIVE:
-                case NEW:
-                case NULL:
-                case PRIVATE:
-                case PROTECTED:
-                case PUBLIC:
-                case RETURN:
-                case SHORT:
-                case STATIC:
-                case STRICTFP:
-                case SUPER:
-                case SWITCH:
-                case SYNCHRONIZED:
-                case THIS:
-                case THROW:
-                case TRANSIENT:
-                case TRUE:
-                case TRY:
-                case VOID:
-                case VOLATILE:
-                case WHILE:
-                case INTEGER_LITERAL:
-                case FLOATING_POINT_LITERAL:
-                case CHARACTER_LITERAL:
-                case STRING_LITERAL:
-                case IDENTIFIER:
-                case LPAREN:
-                case LBRACE:
-                case SEMICOLON:
-                case AT:
-                case INCR:
-                case DECR:
-                    break;
-                default:
-                    break label_18;
-            }
+        while (isKeyword(currentTokenType())) {
             BlockStatement();
         }
         jj_consume_token(RBRACE);
@@ -1982,63 +1986,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void Block() throws ParseException {
         jj_consume_token(LBRACE);
-        label_42:
-        while (true) {
-            switch (currentTokenType()) {
-                case ABSTRACT:
-                case ASSERT:
-                case BOOLEAN:
-                case BREAK:
-                case BYTE:
-                case CHAR:
-                case CLASS:
-                case CONTINUE:
-                case DO:
-                case DOUBLE:
-                case FALSE:
-                case FINAL:
-                case FLOAT:
-                case FOR:
-                case IF:
-                case INT:
-                case INTERFACE:
-                case LONG:
-                case NATIVE:
-                case NEW:
-                case NULL:
-                case PRIVATE:
-                case PROTECTED:
-                case PUBLIC:
-                case RETURN:
-                case SHORT:
-                case STATIC:
-                case STRICTFP:
-                case SUPER:
-                case SWITCH:
-                case SYNCHRONIZED:
-                case THIS:
-                case THROW:
-                case TRANSIENT:
-                case TRUE:
-                case TRY:
-                case VOID:
-                case VOLATILE:
-                case WHILE:
-                case INTEGER_LITERAL:
-                case FLOATING_POINT_LITERAL:
-                case CHARACTER_LITERAL:
-                case STRING_LITERAL:
-                case IDENTIFIER:
-                case LPAREN:
-                case LBRACE:
-                case SEMICOLON:
-                case AT:
-                case INCR:
-                case DECR:
-                    break;
-                default:
-                    break label_42;
-            }
+        while (isKeyword(currentTokenType())) {
             BlockStatement();
         }
         jj_consume_token(RBRACE);
@@ -2104,14 +2052,7 @@ public class JavaParser15 implements JavaParserInterface {
         Modifiers();
         Type();
         VariableDeclarator();
-        label_43:
-        while (true) {
-            switch (currentTokenType()) {
-                case COMMA:
-                    break;
-                default:
-                    break label_43;
-            }
+        while (currentTokenType() == COMMA) {
             jj_consume_token(COMMA);
             VariableDeclarator();
         }
@@ -2208,73 +2149,9 @@ public class JavaParser15 implements JavaParserInterface {
         Expression();
         jj_consume_token(RPAREN);
         jj_consume_token(LBRACE);
-        label_44:
-        while (true) {
-            switch (currentTokenType()) {
-                case CASE:
-                case _DEFAULT:
-                    break;
-                default:
-                    break label_44;
-            }
+        while (currentTokenType() == CASE || currentTokenType() == DEFAULT) {
             SwitchLabel();
-            label_45:
-            while (true) {
-                switch (currentTokenType()) {
-                    case ABSTRACT:
-                    case ASSERT:
-                    case BOOLEAN:
-                    case BREAK:
-                    case BYTE:
-                    case CHAR:
-                    case CLASS:
-                    case CONTINUE:
-                    case DO:
-                    case DOUBLE:
-                    case FALSE:
-                    case FINAL:
-                    case FLOAT:
-                    case FOR:
-                    case IF:
-                    case INT:
-                    case INTERFACE:
-                    case LONG:
-                    case NATIVE:
-                    case NEW:
-                    case NULL:
-                    case PRIVATE:
-                    case PROTECTED:
-                    case PUBLIC:
-                    case RETURN:
-                    case SHORT:
-                    case STATIC:
-                    case STRICTFP:
-                    case SUPER:
-                    case SWITCH:
-                    case SYNCHRONIZED:
-                    case THIS:
-                    case THROW:
-                    case TRANSIENT:
-                    case TRUE:
-                    case TRY:
-                    case VOID:
-                    case VOLATILE:
-                    case WHILE:
-                    case INTEGER_LITERAL:
-                    case FLOATING_POINT_LITERAL:
-                    case CHARACTER_LITERAL:
-                    case STRING_LITERAL:
-                    case IDENTIFIER:
-                    case LPAREN:
-                    case LBRACE:
-                    case SEMICOLON:
-                    case AT:
-                    case INCR:
-                    case DECR:
-                        break;
-                    default:
-                        break label_45;
-                }
+            while (isKeyword(currentTokenType())) {
                 BlockStatement();
             }
         }
@@ -2784,40 +2661,42 @@ public class JavaParser15 implements JavaParserInterface {
         AnnotationTypeBody();
     }
 
+    private static boolean isVariableType(int type) {
+        switch (type) {
+            case ABSTRACT:
+            case BOOLEAN:
+            case BYTE:
+            case CHAR:
+            case CLASS:
+            case DOUBLE:
+            case ENUM:
+            case FINAL:
+            case FLOAT:
+            case INT:
+            case INTERFACE:
+            case LONG:
+            case NATIVE:
+            case PRIVATE:
+            case PROTECTED:
+            case PUBLIC:
+            case SHORT:
+            case STATIC:
+            case STRICTFP:
+            case SYNCHRONIZED:
+            case TRANSIENT:
+            case VOLATILE:
+            case IDENTIFIER:
+            case SEMICOLON:
+            case AT:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     final public void AnnotationTypeBody() throws ParseException {
         jj_consume_token(LBRACE);
-        label_50:
-        while (true) {
-            switch (currentTokenType()) {
-                case ABSTRACT:
-                case BOOLEAN:
-                case BYTE:
-                case CHAR:
-                case CLASS:
-                case DOUBLE:
-                case ENUM:
-                case FINAL:
-                case FLOAT:
-                case INT:
-                case INTERFACE:
-                case LONG:
-                case NATIVE:
-                case PRIVATE:
-                case PROTECTED:
-                case PUBLIC:
-                case SHORT:
-                case STATIC:
-                case STRICTFP:
-                case SYNCHRONIZED:
-                case TRANSIENT:
-                case VOLATILE:
-                case IDENTIFIER:
-                case SEMICOLON:
-                case AT:
-                    break;
-                default:
-                    break label_50;
-            }
+        while (isVariableType(currentTokenType())) {
             AnnotationTypeMemberDeclaration();
         }
         jj_consume_token(RBRACE);
