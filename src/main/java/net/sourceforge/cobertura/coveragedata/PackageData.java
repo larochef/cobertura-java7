@@ -30,125 +30,109 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class PackageData extends CoverageDataContainer<ClassData>
-		implements Comparable, HasBeenInstrumented {
+        implements Comparable, HasBeenInstrumented {
 
-	private static final long serialVersionUID = 7;
+    private static final long serialVersionUID = 7;
 
-	private String name;
+    private String name;
 
-	public PackageData(String name)
-	{
-		if (name == null)
-			throw new IllegalArgumentException(
-					"Package name must be specified.");
-		this.name = name;
-	}
-    
-	public void addClassData(ClassData classData)
-	{
-		lock.lock();
-		try
-		{
-			if (children.containsKey(classData.getBaseName()))
-				throw new IllegalArgumentException("Package " + this.name
-						+ " already contains a class with the name "
-						+ classData.getBaseName());
-	
-			// Each key is a class basename, stored as an String object.
-			// Each value is information about the class, stored as a ClassData object.
-			children.put(classData.getBaseName(), classData);
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
+    public PackageData(String name) {
+        if (name == null)
+            throw new IllegalArgumentException(
+                    "Package name must be specified.");
+        this.name = name;
+    }
 
-	/**
-	 * This is required because we implement Comparable.
-	 */
-	public int compareTo(Object o)
-	{
-		if (!o.getClass().equals(PackageData.class))
-			return Integer.MAX_VALUE;
-		return this.name.compareTo(((PackageData)o).name);
-	}
+    public void addClassData(ClassData classData) {
+        lock.lock();
+        try {
+            if (children.containsKey(classData.getBaseName()))
+                throw new IllegalArgumentException("Package " + this.name
+                        + " already contains a class with the name "
+                        + classData.getBaseName());
 
-	public boolean contains(String name)
-	{
-		lock.lock();
-		try
-		{
-			return this.children.containsKey(name);
-		}
-		finally
-		{
-			lock.unlock();
-		}
-	}
+            // Each key is a class basename, stored as an String object.
+            // Each value is information about the class, stored as a ClassData object.
+            children.put(classData.getBaseName(), classData);
+        } finally {
+            lock.unlock();
+        }
+    }
 
-	/**
-	 * Returns true if the given object is an instance of the
-	 * PackageData class, and it contains the same data as this
-	 * class.
-	 */
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if ((obj == null) || !(obj.getClass().equals(this.getClass())))
-			return false;
+    /**
+     * This is required because we implement Comparable.
+     */
+    public int compareTo(Object o) {
+        if (!o.getClass().equals(PackageData.class))
+            return Integer.MAX_VALUE;
+        return this.name.compareTo(((PackageData) o).name);
+    }
 
-		PackageData packageData = (PackageData)obj;
-		getBothLocks(packageData);
-		try
-		{
-			return super.equals(obj) && this.name.equals(packageData.name);
-		}
-		finally
-		{
-			lock.unlock();
-			packageData.lock.unlock();
-		}
-	}
+    public boolean contains(String name) {
+        lock.lock();
+        try {
+            return this.children.containsKey(name);
+        } finally {
+            lock.unlock();
+        }
+    }
 
-	public SortedSet<ClassData> getClasses() {
-		lock.lock();
-		try {
-			return new TreeSet<ClassData>(this.children.values());
-		}
-		finally {
-			lock.unlock();
-		}
-	}
+    /**
+     * Returns true if the given object is an instance of the
+     * PackageData class, and it contains the same data as this
+     * class.
+     */
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if ((obj == null) || !(obj.getClass().equals(this.getClass())))
+            return false;
 
-	public String getName() {
-		return this.name;
-	}
+        PackageData packageData = (PackageData) obj;
+        getBothLocks(packageData);
+        try {
+            return super.equals(obj) && this.name.equals(packageData.name);
+        } finally {
+            lock.unlock();
+            packageData.lock.unlock();
+        }
+    }
 
-	public Collection<SourceFileData> getSourceFiles() {
-		SortedMap<String, SourceFileData> sourceFileDatas = new TreeMap<String, SourceFileData>();
-		
-		lock.lock();
-		try {
-            for(ClassData classData : this.children.values()) {
-				String sourceFileName = classData.getSourceFileName();
-				SourceFileData sourceFileData = sourceFileDatas.get(sourceFileName);
-				if (sourceFileData == null) {
-					sourceFileData = new SourceFileData(sourceFileName);
-					sourceFileDatas.put(sourceFileName, sourceFileData);
-				}
-				sourceFileData.addClassData(classData);
-			}
-		}
-		finally {
-			lock.unlock();
-		}
-		return sourceFileDatas.values();
-	}
+    public SortedSet<ClassData> getClasses() {
+        lock.lock();
+        try {
+            return new TreeSet<ClassData>(this.children.values());
+        } finally {
+            lock.unlock();
+        }
+    }
 
-	public int hashCode() {
-		return this.name.hashCode();
-	}
+    public String getName() {
+        return this.name;
+    }
+
+    public Collection<SourceFileData> getSourceFiles() {
+        SortedMap<String, SourceFileData> sourceFileDatas = new TreeMap<String, SourceFileData>();
+
+        lock.lock();
+        try {
+            for (ClassData classData : this.children.values()) {
+                String sourceFileName = classData.getSourceFileName();
+                SourceFileData sourceFileData = sourceFileDatas.get(sourceFileName);
+                if (sourceFileData == null) {
+                    sourceFileData = new SourceFileData(sourceFileName);
+                    sourceFileDatas.put(sourceFileName, sourceFileData);
+                }
+                sourceFileData.addClassData(classData);
+            }
+        } finally {
+            lock.unlock();
+        }
+        return sourceFileDatas.values();
+    }
+
+    public int hashCode() {
+        return this.name.hashCode();
+    }
 
 }

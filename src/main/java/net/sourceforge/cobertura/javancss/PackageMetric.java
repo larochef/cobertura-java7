@@ -42,12 +42,12 @@ package net.sourceforge.cobertura.javancss;
 /**
  * Basic data class to store all metrics attached to a package.
  *
- * @author  Chr. Clemens Lee <clemens@kclee.com>
+ * @author Chr. Clemens Lee <clemens@kclee.com>
  * @version $Id: PackageMetric.java 121 2009-01-17 22:19:45Z hboutemy $
  */
 public class PackageMetric extends Metric {
-    public int classes    = 0;
-    public int functions  = 0;
+    public int classes = 0;
+    public int functions = 0;
 
     public PackageMetric() {
         super();
@@ -55,7 +55,7 @@ public class PackageMetric extends Metric {
 
     public void clear() {
         super.clear();
-        classes   = 0;
+        classes = 0;
         functions = 0;
     }
 
@@ -63,13 +63,13 @@ public class PackageMetric extends Metric {
         if (pPackageMetric_ == null) {
             return;
         }
-        classes    += pPackageMetric_.classes;
-        functions  += pPackageMetric_.functions;
-        ncss       += pPackageMetric_.ncss;
+        classes += pPackageMetric_.classes;
+        functions += pPackageMetric_.functions;
+        ncss += pPackageMetric_.ncss;
 
-        javadocs   += pPackageMetric_.javadocs;
+        javadocs += pPackageMetric_.javadocs;
         javadocsLn += pPackageMetric_.javadocsLn;
-        singleLn   += pPackageMetric_.singleLn;
-        multiLn    += pPackageMetric_.multiLn;
+        singleLn += pPackageMetric_.singleLn;
+        multiLn += pPackageMetric_.multiLn;
     }
 }

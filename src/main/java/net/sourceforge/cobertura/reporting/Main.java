@@ -40,141 +40,132 @@ import org.apache.log4j.Logger;
 
 public class Main {
 
-	private static final Logger LOGGER = Logger.getLogger(Main.class);
+    private static final Logger LOGGER = Logger.getLogger(Main.class);
 
-	private String format = "html";
-	private File dataFile = null;
-	private File destinationDir = null;
-	private String encoding = "UTF-8";
-	
-	private void parseArguments(String[] args) throws Exception {
-		FileFinder finder = new FileFinder();
-		String baseDir = null;
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("--basedir")) {
-				baseDir = args[++i];
-			} else if (args[i].equals("--datafile")) {
-				setDataFile( args[++i]);
-			} else if (args[i].equals("--destination")) {
-				setDestination( args[++i]);
-			} else if (args[i].equals("--format")) {
-				setFormat( args[++i]);
-			} else if (args[i].equals("--encoding")) {
-				setEncoding( args[++i]);
-			} else {
-				if( baseDir==null) {
-					finder.addSourceDirectory( args[i]);
-				} else {
-					finder.addSourceFile( baseDir, args[i]);
-				}
-			}
-		}
+    private String format = "html";
+    private File dataFile = null;
+    private File destinationDir = null;
+    private String encoding = "UTF-8";
 
-		if (dataFile == null)
-			dataFile = CoverageDataFileHandler.getDefaultDataFile();
+    private void parseArguments(String[] args) throws Exception {
+        FileFinder finder = new FileFinder();
+        String baseDir = null;
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--basedir")) {
+                baseDir = args[++i];
+            } else if (args[i].equals("--datafile")) {
+                setDataFile(args[++i]);
+            } else if (args[i].equals("--destination")) {
+                setDestination(args[++i]);
+            } else if (args[i].equals("--format")) {
+                setFormat(args[++i]);
+            } else if (args[i].equals("--encoding")) {
+                setEncoding(args[++i]);
+            } else {
+                if (baseDir == null) {
+                    finder.addSourceDirectory(args[i]);
+                } else {
+                    finder.addSourceFile(baseDir, args[i]);
+                }
+            }
+        }
 
-		if (destinationDir == null)
-		{
-			System.err.println("Error: destination directory must be set");
-			System.exit(1);
-		}
+        if (dataFile == null)
+            dataFile = CoverageDataFileHandler.getDefaultDataFile();
 
-		if (format == null)
-		{
-			System.err.println("Error: format must be set");
-			System.exit(1);
-		}
-		
-		if (LOGGER.isDebugEnabled())
-		{
-			LOGGER.debug("format is " + format + " encoding is " + encoding);
-			LOGGER.debug("dataFile is " + dataFile.getAbsolutePath());
-			LOGGER.debug("destinationDir is "
-					+ destinationDir.getAbsolutePath());
-		}
+        if (destinationDir == null) {
+            System.err.println("Error: destination directory must be set");
+            System.exit(1);
+        }
 
-		ProjectData projectData = CoverageDataFileHandler.loadCoverageData(dataFile);
+        if (format == null) {
+            System.err.println("Error: format must be set");
+            System.exit(1);
+        }
 
-		if (projectData == null) {
-			System.err.println("Error: Unable to read from data file " + dataFile.getAbsolutePath());
-			System.exit(1);
-		}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("format is " + format + " encoding is " + encoding);
+            LOGGER.debug("dataFile is " + dataFile.getAbsolutePath());
+            LOGGER.debug("destinationDir is "
+                    + destinationDir.getAbsolutePath());
+        }
 
-		ComplexityCalculator complexity = new ComplexityCalculator(finder);
-		if (format.equalsIgnoreCase("html")) {
-			new HTMLReport(projectData, destinationDir, finder, complexity, encoding);
-		} else if (format.equalsIgnoreCase("xml")) {
-			new XMLReport(projectData, destinationDir, finder, complexity);
-		} else if (format.equalsIgnoreCase("summaryXml")) {
-			new SummaryXMLReport(projectData, destinationDir, finder, complexity);
-		}
-	}
-	
-	private void setFormat(String value) 
-	{
-		format = value;
-		if (!format.equalsIgnoreCase("html") 
-				&& !format.equalsIgnoreCase("xml")
-				&& !format.equalsIgnoreCase("summaryXml")) {
-			System.err.println("" +
-					"Error: format \"" +
-					format + "\" is invalid. Must be either html or xml or summaryXml"
-					);
-			System.exit(1);
-		}
-	}
+        ProjectData projectData = CoverageDataFileHandler.loadCoverageData(dataFile);
 
-	private void setDataFile(String value) 
-	{
-		dataFile = new File(value);
-		if (!dataFile.exists())
-		{
-			System.err.println("Error: data file " + dataFile.getAbsolutePath()
-					+ " does not exist");
-			System.exit(1);
-		}
-		if (!dataFile.isFile())
-		{
-			System.err.println("Error: data file " + dataFile.getAbsolutePath()
-					+ " must be a regular file");
-			System.exit(1);
-		}
-	}
+        if (projectData == null) {
+            System.err.println("Error: Unable to read from data file " + dataFile.getAbsolutePath());
+            System.exit(1);
+        }
 
-	private void setDestination(String value) 
-	{
-		destinationDir = new File(value);
-		if (destinationDir.exists() && !destinationDir.isDirectory())
-		{
-			System.err.println("Error: destination directory " + destinationDir
-					+ " already exists but is not a directory");
-			System.exit(1);
-		}
-		destinationDir.mkdirs();
-	}
+        ComplexityCalculator complexity = new ComplexityCalculator(finder);
+        if (format.equalsIgnoreCase("html")) {
+            new HTMLReport(projectData, destinationDir, finder, complexity, encoding);
+        } else if (format.equalsIgnoreCase("xml")) {
+            new XMLReport(projectData, destinationDir, finder, complexity);
+        } else if (format.equalsIgnoreCase("summaryXml")) {
+            new SummaryXMLReport(projectData, destinationDir, finder, complexity);
+        }
+    }
 
-	private void setEncoding(String encoding){
-		this.encoding = encoding;
-	}
-	
-	public static void main(String[] args) throws Exception {
-		Header.print(System.out);
+    private void setFormat(String value) {
+        format = value;
+        if (!format.equalsIgnoreCase("html")
+                && !format.equalsIgnoreCase("xml")
+                && !format.equalsIgnoreCase("summaryXml")) {
+            System.err.println("" +
+                    "Error: format \"" +
+                    format + "\" is invalid. Must be either html or xml or summaryXml"
+            );
+            System.exit(1);
+        }
+    }
 
-		long startTime = System.currentTimeMillis();
+    private void setDataFile(String value) {
+        dataFile = new File(value);
+        if (!dataFile.exists()) {
+            System.err.println("Error: data file " + dataFile.getAbsolutePath()
+                    + " does not exist");
+            System.exit(1);
+        }
+        if (!dataFile.isFile()) {
+            System.err.println("Error: data file " + dataFile.getAbsolutePath()
+                    + " must be a regular file");
+            System.exit(1);
+        }
+    }
 
-		Main main = new Main();
+    private void setDestination(String value) {
+        destinationDir = new File(value);
+        if (destinationDir.exists() && !destinationDir.isDirectory()) {
+            System.err.println("Error: destination directory " + destinationDir
+                    + " already exists but is not a directory");
+            System.exit(1);
+        }
+        destinationDir.mkdirs();
+    }
 
-		try {
-			args = CommandLineBuilder.preprocessCommandLineArguments( args);
-		} catch( Exception ex) {
-			System.err.println( "Error: Cannot process arguments: " + ex.getMessage());
-			System.exit(1);
-		}
-		
-		main.parseArguments(args);
+    private void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
 
-		long stopTime = System.currentTimeMillis();
-		System.out.println("Report time: " + (stopTime - startTime) + "ms");
-	}
+    public static void main(String[] args) throws Exception {
+        Header.print(System.out);
+
+        long startTime = System.currentTimeMillis();
+
+        Main main = new Main();
+
+        try {
+            args = CommandLineBuilder.preprocessCommandLineArguments(args);
+        } catch (Exception ex) {
+            System.err.println("Error: Cannot process arguments: " + ex.getMessage());
+            System.exit(1);
+        }
+
+        main.parseArguments(args);
+
+        long stopTime = System.currentTimeMillis();
+        System.out.println("Report time: " + (stopTime - startTime) + "ms");
+    }
 
 }

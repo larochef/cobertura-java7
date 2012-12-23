@@ -84,194 +84,164 @@ import org.apache.tools.ant.types.DirSet;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.Reference;
 
-public abstract class CommonMatchingTask extends MatchingTask
-{
+public abstract class CommonMatchingTask extends MatchingTask {
 
-	final String className;
-	final List fileSets = new LinkedList();
+    final String className;
+    final List fileSets = new LinkedList();
 
-	private Java java = null;
-	private String maxMemory = null;
-	private int forkedJVMDebugPort;
-	protected boolean failOnError = false;
+    private Java java = null;
+    private String maxMemory = null;
+    private int forkedJVMDebugPort;
+    protected boolean failOnError = false;
 
-	public CommonMatchingTask(String className)
-	{
-		this.className = className;
-	}
+    public CommonMatchingTask(String className) {
+        this.className = className;
+    }
 
-	private String getClassName()
-	{
-		return className;
-	}
+    private String getClassName() {
+        return className;
+    }
 
-	protected Java getJava()
-	{
-		if (java == null)
-		{
-			java = (Java)getProject().createTask("java");
-			java.setTaskName(getTaskName());
-			java.setClassname(getClassName());
-			java.setFork(true);
-			java.setFailonerror(failOnError);
-			java.setDir(getProject().getBaseDir());
-			if (maxMemory != null)
-				java.setJvmargs("-Xmx" + maxMemory);
-			if (forkedJVMDebugPort > 0)
-			{
-				java.setJvmargs("-Xdebug");
-				java.setJvmargs("-Xrunjdwp:transport=dt_socket,address=" + forkedJVMDebugPort + ",server=y,suspend=y");
-			}
+    protected Java getJava() {
+        if (java == null) {
+            java = (Java) getProject().createTask("java");
+            java.setTaskName(getTaskName());
+            java.setClassname(getClassName());
+            java.setFork(true);
+            java.setFailonerror(failOnError);
+            java.setDir(getProject().getBaseDir());
+            if (maxMemory != null)
+                java.setJvmargs("-Xmx" + maxMemory);
+            if (forkedJVMDebugPort > 0) {
+                java.setJvmargs("-Xdebug");
+                java.setJvmargs("-Xrunjdwp:transport=dt_socket,address=" + forkedJVMDebugPort + ",server=y,suspend=y");
+            }
 
-			/**
-			 * We replace %20 with a space character because, for some
-			 * reason, when we call Cobertura from within CruiseControl,
-			 * the classpath here contains %20's instead of spaces.  I
-			 * don't know if this is our problem, or CruiseControl, or
-			 * ant, but this seems to fix it.  --Mark
-			 */
-			if (getClass().getClassLoader() instanceof AntClassLoader)
-			{
-				String classpath = ((AntClassLoader)getClass()
-						.getClassLoader()).getClasspath();
-				createClasspath().setPath(
-						StringUtil.replaceAll(classpath, "%20", " "));
-			}
-			else if (getClass().getClassLoader() instanceof URLClassLoader)
-			{
-				URL[] earls = ((URLClassLoader)getClass().getClassLoader())
-						.getURLs();
-				for (int i = 0; i < earls.length; i++)
-				{
-					String classpath = (new File(earls[i].getFile())).getAbsolutePath();
-					createClasspath().setPath(
-							StringUtil.replaceAll(classpath, "%20", " "));
-				}
-			}
-		}
+            /**
+             * We replace %20 with a space character because, for some
+             * reason, when we call Cobertura from within CruiseControl,
+             * the classpath here contains %20's instead of spaces.  I
+             * don't know if this is our problem, or CruiseControl, or
+             * ant, but this seems to fix it.  --Mark
+             */
+            if (getClass().getClassLoader() instanceof AntClassLoader) {
+                String classpath = ((AntClassLoader) getClass()
+                        .getClassLoader()).getClasspath();
+                createClasspath().setPath(
+                        StringUtil.replaceAll(classpath, "%20", " "));
+            } else if (getClass().getClassLoader() instanceof URLClassLoader) {
+                URL[] earls = ((URLClassLoader) getClass().getClassLoader())
+                        .getURLs();
+                for (int i = 0; i < earls.length; i++) {
+                    String classpath = (new File(earls[i].getFile())).getAbsolutePath();
+                    createClasspath().setPath(
+                            StringUtil.replaceAll(classpath, "%20", " "));
+                }
+            }
+        }
 
-		return java;
-	}
+        return java;
+    }
 
-	protected void createArgumentsForFilesets( CommandLineBuilder builder) throws IOException {
-		Iterator iter = fileSets.iterator();
-		boolean filesetFound = false;
-		while (iter.hasNext())
-		{
-			AbstractFileSet fileSet = (AbstractFileSet)iter.next();
+    protected void createArgumentsForFilesets(CommandLineBuilder builder) throws IOException {
+        Iterator iter = fileSets.iterator();
+        boolean filesetFound = false;
+        while (iter.hasNext()) {
+            AbstractFileSet fileSet = (AbstractFileSet) iter.next();
 
-			if (fileSet instanceof FileSet)
-			{
-				filesetFound = true;
-				builder.addArg("--basedir", baseDir(fileSet));
-				createArgumentsForFilenames( builder, getFilenames(fileSet));
-			}
-			else
-			{
-				if (filesetFound)
-				{
-					/*
+            if (fileSet instanceof FileSet) {
+                filesetFound = true;
+                builder.addArg("--basedir", baseDir(fileSet));
+                createArgumentsForFilenames(builder, getFilenames(fileSet));
+            } else {
+                if (filesetFound) {                    /*
 					 * Once --basedir has been used, it cannot be undone without changes to the
 					 * Main methods.   So, any dirsets have to come before filesets.
 					 */
-					throw new BuildException("Dirsets have to come before filesets");
-				}
-				createArgumentsForFilenames( builder, getDirectoryScanner(fileSet).getIncludedDirectories());
-			}
-		}
-	}
+                    throw new BuildException("Dirsets have to come before filesets");
+                }
+                createArgumentsForFilenames(builder, getDirectoryScanner(fileSet).getIncludedDirectories());
+            }
+        }
+    }
 
-	private void createArgumentsForFilenames( CommandLineBuilder builder, String[] filenames) throws IOException
-	{
-		for (int i = 0; i < filenames.length; i++)
-		{
-			getProject().log("Adding " + filenames[i] + " to list",
-					Project.MSG_VERBOSE);
-			builder.addArg(filenames[i]);
-		}
-	}
+    private void createArgumentsForFilenames(CommandLineBuilder builder, String[] filenames) throws IOException {
+        for (int i = 0; i < filenames.length; i++) {
+            getProject().log("Adding " + filenames[i] + " to list",
+                    Project.MSG_VERBOSE);
+            builder.addArg(filenames[i]);
+        }
+    }
 
-	public Path createClasspath()
-	{
-		return getJava().createClasspath().createPath();
-	}
+    public Path createClasspath() {
+        return getJava().createClasspath().createPath();
+    }
 
-	public void setClasspath(Path classpath)
-	{
-		createClasspath().append(classpath);
-	}
+    public void setClasspath(Path classpath) {
+        createClasspath().append(classpath);
+    }
 
-	public void setClasspathRef(Reference r)
-	{
-		createClasspath().setRefid(r);
-	}
+    public void setClasspathRef(Reference r) {
+        createClasspath().setRefid(r);
+    }
 
-	DirectoryScanner getDirectoryScanner(AbstractFileSet fileSet)
-	{
-		return fileSet.getDirectoryScanner(getProject());
-	}
+    DirectoryScanner getDirectoryScanner(AbstractFileSet fileSet) {
+        return fileSet.getDirectoryScanner(getProject());
+    }
 
-	String[] getIncludedFiles(AbstractFileSet fileSet)
-	{
-		return getDirectoryScanner(fileSet).getIncludedFiles();
-	}
+    String[] getIncludedFiles(AbstractFileSet fileSet) {
+        return getDirectoryScanner(fileSet).getIncludedFiles();
+    }
 
-	String[] getExcludedFiles(FileSet fileSet)
-	{
-		return getDirectoryScanner(fileSet).getExcludedFiles();
-	}
+    String[] getExcludedFiles(FileSet fileSet) {
+        return getDirectoryScanner(fileSet).getExcludedFiles();
+    }
 
-	String[] getFilenames(AbstractFileSet fileSet)
-	{
-		String[] filesToReturn = getIncludedFiles(fileSet);
+    String[] getFilenames(AbstractFileSet fileSet) {
+        String[] filesToReturn = getIncludedFiles(fileSet);
 
-		return filesToReturn;
-	}
+        return filesToReturn;
+    }
 
-	String baseDir(AbstractFileSet fileSet)
-	{
-		return fileSet.getDirectoryScanner(getProject()).getBasedir()
-				.toString();
-	}
+    String baseDir(AbstractFileSet fileSet) {
+        return fileSet.getDirectoryScanner(getProject()).getBasedir()
+                .toString();
+    }
 
-	public void addDirSet(DirSet dirSet)
-	{
-		fileSets.add(dirSet);
-	}
-	
-	public void addFileset(FileSet fileSet)
-	{
-		fileSets.add(fileSet);
-	}
+    public void addDirSet(DirSet dirSet) {
+        fileSets.add(dirSet);
+    }
 
-	/**
-	 * @param maxMemory Assumed to be something along the lines of
-	 *        100M or 50K or 1G.
-	 */
-	public void setMaxMemory(String maxMemory)
-	{
-		this.maxMemory = maxMemory != null ? maxMemory.trim() : null;
-	}
-	
-	/**
-	 * Used to debug the process that is forked to perform the operation.
-	 * Setting this to a non-zero number will cause the process to open
-	 * a debug port on that port number.   It will suspend until a 
-	 * remote debugger is attached to the port.
-	 * 
-	 * @param forkedJVMDebugPort
-	 */
-	public void setForkedJVMDebugPort(int forkedJVMDebugPort)
-	{
-		this.forkedJVMDebugPort = forkedJVMDebugPort;
-	}
+    public void addFileset(FileSet fileSet) {
+        fileSets.add(fileSet);
+    }
+
+    /**
+     * @param maxMemory Assumed to be something along the lines of
+     *                  100M or 50K or 1G.
+     */
+    public void setMaxMemory(String maxMemory) {
+        this.maxMemory = maxMemory != null ? maxMemory.trim() : null;
+    }
+
+    /**
+     * Used to debug the process that is forked to perform the operation.
+     * Setting this to a non-zero number will cause the process to open
+     * a debug port on that port number.   It will suspend until a
+     * remote debugger is attached to the port.
+     *
+     * @param forkedJVMDebugPort
+     */
+    public void setForkedJVMDebugPort(int forkedJVMDebugPort) {
+        this.forkedJVMDebugPort = forkedJVMDebugPort;
+    }
 
     /**
      * If true, then fail if the command exits with a
      * returncode other than zero.
      *
      * @param fail if true fail the build when the command exits with a
-     * nonzero returncode.
+     *             nonzero returncode.
      */
     public void setFailonerror(boolean fail) {
         failOnError = fail;

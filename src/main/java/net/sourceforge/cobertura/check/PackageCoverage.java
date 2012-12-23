@@ -21,52 +21,43 @@
 
 package net.sourceforge.cobertura.check;
 
-public class PackageCoverage
-{
+public class PackageCoverage {
 
-	private double branchCount;
-	private double lineCount;
-	private double branchCoverage;
-	private double lineCoverage;
+    private double branchCount;
+    private double lineCount;
+    private double branchCoverage;
+    private double lineCoverage;
 
-	public double getBranchCount()
-	{
-		return branchCount;
-	}
+    public double getBranchCount() {
+        return branchCount;
+    }
 
-	public void addBranchCount(double branchCount)
-	{
-		this.branchCount += branchCount;
-	}
+    public void addBranchCount(double branchCount) {
+        this.branchCount += branchCount;
+    }
 
-	public double getLineCount()
-	{
-		return lineCount;
-	}
+    public double getLineCount() {
+        return lineCount;
+    }
 
-	public void addLineCount(double lineCount)
-	{
-		this.lineCount += lineCount;
-	}
+    public void addLineCount(double lineCount) {
+        this.lineCount += lineCount;
+    }
 
-	public double getBranchCoverage()
-	{
-		return branchCoverage;
-	}
+    public double getBranchCoverage() {
+        return branchCoverage;
+    }
 
-	public void addBranchCoverage(double branchCoverage)
-	{
-		this.branchCoverage += branchCoverage;
-	}
+    public void addBranchCoverage(double branchCoverage) {
+        this.branchCoverage += branchCoverage;
+    }
 
-	public double getLineCoverage()
-	{
-		return lineCoverage;
-	}
+    public double getLineCoverage() {
+        return lineCoverage;
+    }
 
-	public void addLineCoverage(double lineCoverage)
-	{
-		this.lineCoverage += lineCoverage;
-	}
+    public void addLineCoverage(double lineCoverage) {
+        this.lineCoverage += lineCoverage;
+    }
 
 }

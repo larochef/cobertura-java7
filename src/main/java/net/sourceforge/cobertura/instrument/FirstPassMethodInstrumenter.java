@@ -35,378 +35,334 @@ import net.sourceforge.cobertura.util.RegexUtil;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+
 import static org.objectweb.asm.Opcodes.*;
+
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.MethodNode;
 
-public class FirstPassMethodInstrumenter extends MethodVisitor
-{
+public class FirstPassMethodInstrumenter extends MethodVisitor {
 
-	private final String ownerClass;
+    private final String ownerClass;
 
-	private final String ownerSuperClass;
+    private final String ownerSuperClass;
 
-	private String myName;
+    private String myName;
 
-	private String myDescriptor;
+    private String myDescriptor;
 
-	private int myAccess;
-   
-	private Collection ignoreRegexs;
-   
-	private Collection ignoreBranchesRegexs;
+    private int myAccess;
 
-	private Collection ignoreMethodAnnotations;
+    private Collection ignoreRegexs;
 
-	private boolean ignoreTrivial = false;
-	private boolean ignored = false;
-	private boolean mightBeTrivial = false;
-	private boolean isGetter = false;
-	private boolean isSetter = false;
-	private boolean isInit = false;
+    private Collection ignoreBranchesRegexs;
 
-	private ClassData classData;
+    private Collection ignoreMethodAnnotations;
 
-	private int currentLine;
-   
-	private int currentJump;
-   
-	private int currentSwitch;
-	
-	private Map jumpTargetLabels;
+    private boolean ignoreTrivial = false;
+    private boolean ignored = false;
+    private boolean mightBeTrivial = false;
+    private boolean isGetter = false;
+    private boolean isSetter = false;
+    private boolean isInit = false;
 
-	private Map switchTargetLabels;
-   
-	private Map lineLabels;
-   
-	private MethodVisitor writerMethodVisitor;
-   
-	private MethodNode methodNode;
+    private ClassData classData;
 
-	public FirstPassMethodInstrumenter(ClassData classData, final MethodVisitor mv,
-			final String owner, final String superOwner, final int access, final String name, final String desc, 
-			final String signature, final String[] exceptions, final Collection ignoreRegexs,
-			final Collection ignoreBranchesRegexs, final Collection ignoreMethodAnnotations,
-			final boolean ignoreTrivial)
-	{
-		super(ASM4, new MethodNode(access, name, desc, signature, exceptions));
-		this.writerMethodVisitor = mv;
-		this.ownerClass = owner;
-		this.ownerSuperClass = superOwner;
-		this.methodNode = (MethodNode) this.mv;
-		this.classData = classData;
-		this.myAccess = access;
-		this.myName = name;
-		this.myDescriptor = desc;
-		this.ignoreRegexs = ignoreRegexs;
-		this.ignoreBranchesRegexs = ignoreBranchesRegexs;
-		this.ignoreMethodAnnotations = ignoreMethodAnnotations;
-		this.ignoreTrivial = ignoreTrivial;
-		this.jumpTargetLabels = new HashMap();
-		this.switchTargetLabels = new HashMap();
-		this.lineLabels = new HashMap();
-		this.currentLine = 0;
+    private int currentLine;
 
-		if (ignoreTrivial)
-		{
-			checkForTrivialSignature();
-		}
-	}
+    private int currentJump;
 
-	private void checkForTrivialSignature()
-	{
-		Type[] args = Type.getArgumentTypes(myDescriptor);
-		Type ret = Type.getReturnType(myDescriptor);
+    private int currentSwitch;
 
-		if (myName.equals("<init>"))
-		{
-			isInit = true;
-			mightBeTrivial = true;
-			return;
-		}
+    private Map jumpTargetLabels;
 
-		// a "setter" method must:
-		// - have a name starting with "set"
-		// - take one arguments
-		// - return nothing (void)
-		if (myName.startsWith("set") && args.length == 1 && ret.equals(Type.VOID_TYPE))
-		{
-			isSetter = true;
-			mightBeTrivial = true;
-			return;
-		}
+    private Map switchTargetLabels;
 
-		// a "getter" method must:
-		// - have a name starting with "get", "is", or "has"
-		// - take no arguments
-		// - return a value (non-void)
-		if ((myName.startsWith("get") || myName.startsWith("is") || myName.startsWith("has")) &&
-			args.length == 0 && !ret.equals(Type.VOID_TYPE))
-		{
-			isGetter = true;
-			mightBeTrivial = true;
-			return;
-		}
-	}
+    private Map lineLabels;
 
-	public void visitEnd() {
-		super.visitEnd();
+    private MethodVisitor writerMethodVisitor;
 
-		// if we get to the end and nothing has ruled out this method being trivial,
-		// then it must be trivial, so we'll ignore it, if configured to do so
-		if(ignoreTrivial && mightBeTrivial) {
-			ignored = true;
-		}
-		
-		if(ignored) {
-			Iterator iter = lineLabels.values().iterator();
-			while (iter.hasNext())
-			{
-				classData.removeLine(((Integer) iter.next()).intValue());
-			}
-			lineLabels.clear();
-		}
+    private MethodNode methodNode;
 
-		methodNode.accept(lineLabels.isEmpty() ? writerMethodVisitor : new SecondPassMethodInstrumenter(this)); //when there is no line number info -> no instrumentation
-	}
+    public FirstPassMethodInstrumenter(ClassData classData, final MethodVisitor mv,
+                                       final String owner, final String superOwner, final int access, final String name, final String desc,
+                                       final String signature, final String[] exceptions, final Collection ignoreRegexs,
+                                       final Collection ignoreBranchesRegexs, final Collection ignoreMethodAnnotations,
+                                       final boolean ignoreTrivial) {
+        super(ASM4, new MethodNode(access, name, desc, signature, exceptions));
+        this.writerMethodVisitor = mv;
+        this.ownerClass = owner;
+        this.ownerSuperClass = superOwner;
+        this.methodNode = (MethodNode) this.mv;
+        this.classData = classData;
+        this.myAccess = access;
+        this.myName = name;
+        this.myDescriptor = desc;
+        this.ignoreRegexs = ignoreRegexs;
+        this.ignoreBranchesRegexs = ignoreBranchesRegexs;
+        this.ignoreMethodAnnotations = ignoreMethodAnnotations;
+        this.ignoreTrivial = ignoreTrivial;
+        this.jumpTargetLabels = new HashMap();
+        this.switchTargetLabels = new HashMap();
+        this.lineLabels = new HashMap();
+        this.currentLine = 0;
 
-	public void visitJumpInsn(int opcode, Label label)
-	{
-		// Ignore any jump instructions in the "class init" method.
-		// When initializing static variables, the JVM first checks
-		// that the variable is null before attempting to set it.
-		// This check contains an IFNONNULL jump instruction which
-		// would confuse people if it showed up in the reports.
-		if ((opcode != GOTO) && (opcode != JSR) && (currentLine != 0)
-				&& (!this.myName.equals("<clinit>")))
-		{
-			classData.addLineJump(currentLine, currentJump);
-			jumpTargetLabels.put(label, new JumpHolder(currentLine, currentJump++));
-		}
-		
-		markNonTrivial();
-		
-		super.visitJumpInsn(opcode, label);
-	}
+        if (ignoreTrivial) {
+            checkForTrivialSignature();
+        }
+    }
 
-	public void visitLineNumber(int line, Label start)
-	{
-		// Record initial information about this line of code
-		currentLine = line;
-		classData.addLine(currentLine, myName, myDescriptor);
-		currentJump = 0;
-		currentSwitch = 0;
-      
-		lineLabels.put(start, new Integer(line));
+    private void checkForTrivialSignature() {
+        Type[] args = Type.getArgumentTypes(myDescriptor);
+        Type ret = Type.getReturnType(myDescriptor);
 
-		//removed because the MethodNode doesn't reproduce visitLineNumber where they are but at the end of the file :-(( 
-		//therefore we don't need them
-		//We can directly instrument the visit line number here, but it is better to leave all instrumentation in the second pass
-		//therefore we just collects what label is the line ...
-		//super.visitLineNumber(line, start);
-	}
+        if (myName.equals("<init>")) {
+            isInit = true;
+            mightBeTrivial = true;
+            return;
+        }
 
-	public void visitFieldInsn(int opcode, String string, String string1, String string2)
-	{
-		super.visitFieldInsn(opcode, string, string1, string2);
+        // a "setter" method must:
+        // - have a name starting with "set"
+        // - take one arguments
+        // - return nothing (void)
+        if (myName.startsWith("set") && args.length == 1 && ret.equals(Type.VOID_TYPE)) {
+            isSetter = true;
+            mightBeTrivial = true;
+            return;
+        }
 
-		if (!ignored && mightBeTrivial)
-		{
-			// trivial opcodes for accessing class fields are:
-			// - GETFIELD or PUTFIELD
-			if ((isGetter && opcode != GETFIELD) ||
-				(isSetter && opcode != PUTFIELD) ||
-				(isInit && opcode != PUTFIELD))
-			{
-				markNonTrivial();
-			}
-		}
-	}
+        // a "getter" method must:
+        // - have a name starting with "get", "is", or "has"
+        // - take no arguments
+        // - return a value (non-void)
+        if ((myName.startsWith("get") || myName.startsWith("is") || myName.startsWith("has")) &&
+                args.length == 0 && !ret.equals(Type.VOID_TYPE)) {
+            isGetter = true;
+            mightBeTrivial = true;
+            return;
+        }
+    }
 
-	public void visitVarInsn(int opcode, int i1)
-	{
-		super.visitVarInsn(opcode, i1);
+    public void visitEnd() {
+        super.visitEnd();
 
-		if (!ignored && mightBeTrivial)
-		{
-			if (
-				opcode == ILOAD ||
-				opcode == LLOAD ||
-				opcode == FLOAD ||
-				opcode == DLOAD ||
-				opcode == ALOAD
-				)
-			{
-				// trivial opcodes for accessing local variables.
-			}
-			else 
-			{
-				markNonTrivial();
-			}
-		}
-	}
+        // if we get to the end and nothing has ruled out this method being trivial,
+        // then it must be trivial, so we'll ignore it, if configured to do so
+        if (ignoreTrivial && mightBeTrivial) {
+            ignored = true;
+        }
 
-	public void visitMethodInsn(int opcode, String owner, String name,
-			String desc)
-	{
-		super.visitMethodInsn(opcode, owner, name, desc);
+        if (ignored) {
+            Iterator iter = lineLabels.values().iterator();
+            while (iter.hasNext()) {
+                classData.removeLine(((Integer) iter.next()).intValue());
+            }
+            lineLabels.clear();
+        }
 
-		// If any of the ignore patterns match this line
-		// then remove it from our data
-		if (RegexUtil.matches(ignoreRegexs, owner)) 
-		{
-			classData.removeLine(currentLine);
-		}
-		if (!ignored && mightBeTrivial)
-		{
-			if (isInit)
-			{
-				// trivial initializers can invoke parent initializers,
-				// but cannot invoke any other methods
-				if (opcode == INVOKESPECIAL && name.equals("<init>") && owner.equals(ownerSuperClass))
-				{
-					// trivial call to super constructor
-				}
-				else
-				{
-					markNonTrivial();
-				}
-			}
-			else
-			{
-				markNonTrivial();
-			}
-		}
-	}
-	
-	public void visitTypeInsn(int i, String string) {
-		super.visitTypeInsn(i, string);
-		markNonTrivial();
-	}
+        methodNode.accept(lineLabels.isEmpty() ? writerMethodVisitor : new SecondPassMethodInstrumenter(this)); //when there is no line number info -> no instrumentation
+    }
 
-	public void visitIntInsn(int i, int i1) {
-		super.visitIntInsn(i, i1);
-		markNonTrivial();
-	}
+    public void visitJumpInsn(int opcode, Label label) {
+        // Ignore any jump instructions in the "class init" method.
+        // When initializing static variables, the JVM first checks
+        // that the variable is null before attempting to set it.
+        // This check contains an IFNONNULL jump instruction which
+        // would confuse people if it showed up in the reports.
+        if ((opcode != GOTO) && (opcode != JSR) && (currentLine != 0)
+                && (!this.myName.equals("<clinit>"))) {
+            classData.addLineJump(currentLine, currentJump);
+            jumpTargetLabels.put(label, new JumpHolder(currentLine, currentJump++));
+        }
 
-	public void visitLdcInsn(Object object) {
-		super.visitLdcInsn(object);
-		markNonTrivial();
-	}
+        markNonTrivial();
 
-	public void visitIincInsn(int i, int i1) {
-		super.visitIincInsn(i, i1);
-		markNonTrivial();
-	}
+        super.visitJumpInsn(opcode, label);
+    }
 
-	public void visitMultiANewArrayInsn(String string, int i) {
-		super.visitMultiANewArrayInsn(string, i);
-		markNonTrivial();
-	}
-	
-	public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels)
-	{
-		super.visitLookupSwitchInsn(dflt, keys, labels);
-      
-		if (currentLine != 0)
-		{
-			switchTargetLabels.put(dflt, new SwitchHolder(currentLine, currentSwitch, -1)); 
-			for (int i = labels.length -1; i >=0; i--)
-				switchTargetLabels.put(labels[i], new SwitchHolder(currentLine, currentSwitch, i));
-			classData.addLineSwitch(currentLine, currentSwitch++, keys);
-		}
-		
-		markNonTrivial();
-	}
+    public void visitLineNumber(int line, Label start) {
+        // Record initial information about this line of code
+        currentLine = line;
+        classData.addLine(currentLine, myName, myDescriptor);
+        currentJump = 0;
+        currentSwitch = 0;
 
-	@Override
-	public AnnotationVisitor visitAnnotation(String desc, boolean visible)
-	{
-		// We need to convert desc to a fully-qualified classname.  Example:
-		//   java.lang.Override --> passed in as this: "Ljava/lang/Override;"
-		if(desc.charAt(0) == 'L' && desc.charAt(desc.length() - 1) == ';')
-		{
-			desc = desc.substring(1, desc.length() - 1).replace('/', '.');
-		}
-		
-		// Check to see if this annotation is one of the ones that we use to 
-		// trigger us to ignore this method
-		if(ignoreMethodAnnotations.contains(desc))
-		{
-			ignored = true;
-		}
-			
-		return super.visitAnnotation(desc, visible);
-	}
+        lineLabels.put(start, new Integer(line));
 
-	public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels)
-	{
-		super.visitTableSwitchInsn(min, max, dflt, labels);
-      
-		if (currentLine != 0)
-		{
-			switchTargetLabels.put(dflt, new SwitchHolder(currentLine, currentSwitch, -1)); 
-			for (int i = labels.length -1; i >=0; i--)
-				switchTargetLabels.put(labels[i], new SwitchHolder(currentLine, currentSwitch, i));
-			classData.addLineSwitch(currentLine, currentSwitch++, min, max);
-		}
-		markNonTrivial();
-	}
+        //removed because the MethodNode doesn't reproduce visitLineNumber where they are but at the end of the file :-((
+        //therefore we don't need them
+        //We can directly instrument the visit line number here, but it is better to leave all instrumentation in the second pass
+        //therefore we just collects what label is the line ...
+        //super.visitLineNumber(line, start);
+    }
 
-	protected void removeLine(int lineNumber) 
-	{
-		classData.removeLine(lineNumber);
-	}
-   
-	protected MethodVisitor getWriterMethodVisitor() 
-	{
-		return writerMethodVisitor;
-	}
+    public void visitFieldInsn(int opcode, String string, String string1, String string2) {
+        super.visitFieldInsn(opcode, string, string1, string2);
 
-	protected Collection getIgnoreRegexs() 
-	{
-		return ignoreRegexs;
-	}
+        if (!ignored && mightBeTrivial) {
+            // trivial opcodes for accessing class fields are:
+            // - GETFIELD or PUTFIELD
+            if ((isGetter && opcode != GETFIELD) ||
+                    (isSetter && opcode != PUTFIELD) ||
+                    (isInit && opcode != PUTFIELD)) {
+                markNonTrivial();
+            }
+        }
+    }
 
-	protected Map getJumpTargetLabels() 
-	{
-		return jumpTargetLabels;
-	}
+    public void visitVarInsn(int opcode, int i1) {
+        super.visitVarInsn(opcode, i1);
 
-	protected Map getSwitchTargetLabels() 
-	{
-		return switchTargetLabels;
-	}
+        if (!ignored && mightBeTrivial) {
+            if (
+                    opcode == ILOAD ||
+                            opcode == LLOAD ||
+                            opcode == FLOAD ||
+                            opcode == DLOAD ||
+                            opcode == ALOAD
+                    ) {
+                // trivial opcodes for accessing local variables.
+            } else {
+                markNonTrivial();
+            }
+        }
+    }
 
-	protected int getMyAccess() 
-	{
-		return myAccess;
-	}
+    public void visitMethodInsn(int opcode, String owner, String name,
+                                String desc) {
+        super.visitMethodInsn(opcode, owner, name, desc);
 
-	protected String getMyDescriptor() 
-	{
-		return myDescriptor;
-	}
+        // If any of the ignore patterns match this line
+        // then remove it from our data
+        if (RegexUtil.matches(ignoreRegexs, owner)) {
+            classData.removeLine(currentLine);
+        }
+        if (!ignored && mightBeTrivial) {
+            if (isInit) {
+                // trivial initializers can invoke parent initializers,
+                // but cannot invoke any other methods
+                if (opcode == INVOKESPECIAL && name.equals("<init>") && owner.equals(ownerSuperClass)) {
+                    // trivial call to super constructor
+                } else {
+                    markNonTrivial();
+                }
+            } else {
+                markNonTrivial();
+            }
+        }
+    }
 
-	protected String getMyName() 
-	{
-		return myName;
-	}
+    public void visitTypeInsn(int i, String string) {
+        super.visitTypeInsn(i, string);
+        markNonTrivial();
+    }
 
-	protected String getOwnerClass() 
-	{
-		return ownerClass;
-	}
+    public void visitIntInsn(int i, int i1) {
+        super.visitIntInsn(i, i1);
+        markNonTrivial();
+    }
 
-	protected Map getLineLabels() 
-	{
-		return lineLabels;
-	}
+    public void visitLdcInsn(Object object) {
+        super.visitLdcInsn(object);
+        markNonTrivial();
+    }
 
-	private void markNonTrivial()
-	{
-		mightBeTrivial = false;
-	}
+    public void visitIincInsn(int i, int i1) {
+        super.visitIincInsn(i, i1);
+        markNonTrivial();
+    }
+
+    public void visitMultiANewArrayInsn(String string, int i) {
+        super.visitMultiANewArrayInsn(string, i);
+        markNonTrivial();
+    }
+
+    public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels) {
+        super.visitLookupSwitchInsn(dflt, keys, labels);
+
+        if (currentLine != 0) {
+            switchTargetLabels.put(dflt, new SwitchHolder(currentLine, currentSwitch, -1));
+            for (int i = labels.length - 1; i >= 0; i--)
+                switchTargetLabels.put(labels[i], new SwitchHolder(currentLine, currentSwitch, i));
+            classData.addLineSwitch(currentLine, currentSwitch++, keys);
+        }
+
+        markNonTrivial();
+    }
+
+    @Override
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        // We need to convert desc to a fully-qualified classname.  Example:
+        //   java.lang.Override --> passed in as this: "Ljava/lang/Override;"
+        if (desc.charAt(0) == 'L' && desc.charAt(desc.length() - 1) == ';') {
+            desc = desc.substring(1, desc.length() - 1).replace('/', '.');
+        }
+
+        // Check to see if this annotation is one of the ones that we use to
+        // trigger us to ignore this method
+        if (ignoreMethodAnnotations.contains(desc)) {
+            ignored = true;
+        }
+
+        return super.visitAnnotation(desc, visible);
+    }
+
+    public void visitTableSwitchInsn(int min, int max, Label dflt, Label[] labels) {
+        super.visitTableSwitchInsn(min, max, dflt, labels);
+
+        if (currentLine != 0) {
+            switchTargetLabels.put(dflt, new SwitchHolder(currentLine, currentSwitch, -1));
+            for (int i = labels.length - 1; i >= 0; i--)
+                switchTargetLabels.put(labels[i], new SwitchHolder(currentLine, currentSwitch, i));
+            classData.addLineSwitch(currentLine, currentSwitch++, min, max);
+        }
+        markNonTrivial();
+    }
+
+    protected void removeLine(int lineNumber) {
+        classData.removeLine(lineNumber);
+    }
+
+    protected MethodVisitor getWriterMethodVisitor() {
+        return writerMethodVisitor;
+    }
+
+    protected Collection getIgnoreRegexs() {
+        return ignoreRegexs;
+    }
+
+    protected Map getJumpTargetLabels() {
+        return jumpTargetLabels;
+    }
+
+    protected Map getSwitchTargetLabels() {
+        return switchTargetLabels;
+    }
+
+    protected int getMyAccess() {
+        return myAccess;
+    }
+
+    protected String getMyDescriptor() {
+        return myDescriptor;
+    }
+
+    protected String getMyName() {
+        return myName;
+    }
+
+    protected String getOwnerClass() {
+        return ownerClass;
+    }
+
+    protected Map getLineLabels() {
+        return lineLabels;
+    }
+
+    private void markNonTrivial() {
+        mightBeTrivial = false;
+    }
 
 
 }

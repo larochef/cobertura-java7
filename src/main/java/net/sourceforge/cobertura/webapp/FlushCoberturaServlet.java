@@ -32,38 +32,35 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class FlushCoberturaServlet extends HttpServlet
-{
+public class FlushCoberturaServlet extends HttpServlet {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	@Override
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException
-    {
+            throws ServletException, IOException {
         try {
             String className = "net.sourceforge.cobertura.coveragedata.ProjectData";
             String methodName = "saveGlobalProjectData";
             Class saveClass = Class.forName(className);
             java.lang.reflect.Method saveMethod = saveClass.getDeclaredMethod(methodName, new Class[0]);
-            saveMethod.invoke(null,new Object[0]);
+            saveMethod.invoke(null, new Object[0]);
         } catch (Throwable t) {
-        	PrintStream ps = new PrintStream(resp.getOutputStream());
-        	ps.println("<HTML><BODY><P>Could not save Cobertura data.  Make sure cobertura.jar is in the web server's lib directory: " + t.getLocalizedMessage());
-        	ps.print("<P>");
-        	t.printStackTrace(ps);
-        	ps.println("</BODY></HTML>");
-        	resp.flushBuffer();
+            PrintStream ps = new PrintStream(resp.getOutputStream());
+            ps.println("<HTML><BODY><P>Could not save Cobertura data.  Make sure cobertura.jar is in the web server's lib directory: " + t.getLocalizedMessage());
+            ps.print("<P>");
+            t.printStackTrace(ps);
+            ps.println("</BODY></HTML>");
+            resp.flushBuffer();
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException
-    {
+            throws ServletException, IOException {
         doGet(req, resp);
     }
 

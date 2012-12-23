@@ -63,10 +63,10 @@ package net.sourceforge.cobertura.javancss;
 /**
  * Basic data class to store all metrics attached to a function.
  *
- * @author  Hervé Boutemy
+ * @author Hervé Boutemy
  * @version $Id: FunctionMetric.java 121 2009-01-17 22:19:45Z hboutemy $
  */
-public class FunctionMetric  extends Metric {
+public class FunctionMetric extends Metric {
     public int ccn = 0;
 
     public FunctionMetric() {

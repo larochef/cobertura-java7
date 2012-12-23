@@ -27,92 +27,77 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class CopyFiles
-{
+public abstract class CopyFiles {
 
-	public static void copy(File destinationDir) throws IOException
-	{
-		File cssOutputDir = new File(destinationDir, "css");
-		File imagesOutputDir = new File(destinationDir, "images");
-		File jsOutputDir = new File(destinationDir, "js");
+    public static void copy(File destinationDir) throws IOException {
+        File cssOutputDir = new File(destinationDir, "css");
+        File imagesOutputDir = new File(destinationDir, "images");
+        File jsOutputDir = new File(destinationDir, "js");
 
-		destinationDir.mkdirs();
-		cssOutputDir.mkdir();
-		imagesOutputDir.mkdir();
-		jsOutputDir.mkdir();
+        destinationDir.mkdirs();
+        cssOutputDir.mkdir();
+        imagesOutputDir.mkdir();
+        jsOutputDir.mkdir();
 
-		copyResourceFromJar("help.css", cssOutputDir);
-		copyResourceFromJar("main.css", cssOutputDir);
-		copyResourceFromJar("sortabletable.css", cssOutputDir);
-		copyResourceFromJar("source-viewer.css", cssOutputDir);
-		copyResourceFromJar("tooltip.css", cssOutputDir);
+        copyResourceFromJar("help.css", cssOutputDir);
+        copyResourceFromJar("main.css", cssOutputDir);
+        copyResourceFromJar("sortabletable.css", cssOutputDir);
+        copyResourceFromJar("source-viewer.css", cssOutputDir);
+        copyResourceFromJar("tooltip.css", cssOutputDir);
 
-		copyResourceFromJar("blank.png", imagesOutputDir);
-		copyResourceFromJar("downsimple.png", imagesOutputDir);
-		copyResourceFromJar("upsimple.png", imagesOutputDir);
+        copyResourceFromJar("blank.png", imagesOutputDir);
+        copyResourceFromJar("downsimple.png", imagesOutputDir);
+        copyResourceFromJar("upsimple.png", imagesOutputDir);
 
-		copyResourceFromJar("customsorttypes.js", jsOutputDir);
-		copyResourceFromJar("popup.js", jsOutputDir);
-		copyResourceFromJar("sortabletable.js", jsOutputDir);
-		copyResourceFromJar("stringbuilder.js", jsOutputDir);
+        copyResourceFromJar("customsorttypes.js", jsOutputDir);
+        copyResourceFromJar("popup.js", jsOutputDir);
+        copyResourceFromJar("sortabletable.js", jsOutputDir);
+        copyResourceFromJar("stringbuilder.js", jsOutputDir);
 
-		copyResourceFromJar("help.html", destinationDir);
-		copyResourceFromJar("index.html", destinationDir);
-	}
+        copyResourceFromJar("help.html", destinationDir);
+        copyResourceFromJar("index.html", destinationDir);
+    }
 
-	/**
-	 * Copy a file from the jar to a directory on the local machine.
-	 *
-	 * @param resourceName The name of the file in the jar.  This file
-	 *        must exist the same package as this method.
-	 * @param directory The directory to copy the jar to.
-	 * @throws IOException If the file could not be read from the
-	 *         jar or written to the disk.
-	 */
-	private static void copyResourceFromJar(String resourceName,
-			File directory) throws IOException
-	{
-		int n;
-		byte[] buf = new byte[1024];
+    /**
+     * Copy a file from the jar to a directory on the local machine.
+     *
+     * @param resourceName The name of the file in the jar.  This file
+     *                     must exist the same package as this method.
+     * @param directory    The directory to copy the jar to.
+     * @throws IOException If the file could not be read from the
+     *                     jar or written to the disk.
+     */
+    private static void copyResourceFromJar(String resourceName,
+                                            File directory) throws IOException {
+        int n;
+        byte[] buf = new byte[1024];
 
-		InputStream in = null;
-		FileOutputStream out = null;
-		directory.mkdirs();
-		try
-		{
-			in = CopyFiles.class.getResourceAsStream(resourceName);
-			if (in == null)
-				throw new IllegalArgumentException("Resource " + resourceName
-						+ " does not exist in this package.");
-			out = new FileOutputStream(new File(directory, resourceName));
-			while ((n = in.read(buf, 0, buf.length)) != -1)
-			{
-				out.write(buf, 0, n);
-			}
-		}
-		finally
-		{
-			if (in != null)
-			{
-				try
-				{
-					in.close();
-				}
-				catch (IOException e)
-				{
-				}
-			}
-			if (out != null)
-			{
-				try
-				{
-					out.close();
-				}
-				catch (IOException e)
-				{
-				}
-			}
-		}
-	}
+        InputStream in = null;
+        FileOutputStream out = null;
+        directory.mkdirs();
+        try {
+            in = CopyFiles.class.getResourceAsStream(resourceName);
+            if (in == null)
+                throw new IllegalArgumentException("Resource " + resourceName
+                        + " does not exist in this package.");
+            out = new FileOutputStream(new File(directory, resourceName));
+            while ((n = in.read(buf, 0, buf.length)) != -1) {
+                out.write(buf, 0, n);
+            }
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                }
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+    }
 
 }

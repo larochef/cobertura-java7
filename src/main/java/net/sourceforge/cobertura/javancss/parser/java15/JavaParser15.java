@@ -501,7 +501,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void TypeParameters() throws ParseException {
         jj_consume_token(LT);
         // Add support for diamond operator
-        if((currentTokenType()) != GT) {
+        if ((currentTokenType()) != GT) {
             TypeParameter();
             while ((currentTokenType()) == COMMA) {
                 jj_consume_token(COMMA);
@@ -567,7 +567,7 @@ public class JavaParser15 implements JavaParserInterface {
                 default:
                     shouldContinue = false;
             }
-            if(shouldContinue) {
+            if (shouldContinue) {
                 ClassOrInterfaceBodyDeclaration(isInterface);
             }
         }
@@ -1872,7 +1872,7 @@ public class JavaParser15 implements JavaParserInterface {
                         jj_consume_token(LBRACKET);
                         jj_consume_token(RBRACKET);
                     }
-                    while((currentTokenType()) == LBRACKET);
+                    while ((currentTokenType()) == LBRACKET);
                     ArrayInitializer();
                     break;
                 default:
@@ -5771,7 +5771,8 @@ public class JavaParser15 implements JavaParserInterface {
         return (jj_ntk == -1) ? jj_ntk() : jj_ntk;
     }
 
-    static private final class LookaheadSuccess extends java.lang.Error {}
+    static private final class LookaheadSuccess extends java.lang.Error {
+    }
 
     final private LookaheadSuccess jj_ls = new LookaheadSuccess();
 
@@ -5799,8 +5800,7 @@ public class JavaParser15 implements JavaParserInterface {
         for (int i = 0; i < index; i++) {
             if (t.next != null) {
                 t = t.next;
-            }
-            else {
+            } else {
                 t = t.next = token_source.getNextToken();
             }
         }
@@ -5810,8 +5810,7 @@ public class JavaParser15 implements JavaParserInterface {
     private int jj_ntk() {
         if ((jj_nt = token.next) == null) {
             return (jj_ntk = (token.next = token_source.getNextToken()).kind);
-        }
-        else {
+        } else {
             return (jj_ntk = jj_nt.kind);
         }
     }

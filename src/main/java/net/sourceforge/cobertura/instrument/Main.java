@@ -63,93 +63,83 @@ import org.objectweb.asm.ClassWriter;
  * <p>
  * Add coverage instrumentation to existing classes.
  * </p>
- *
+ * <p/>
  * <h3>What does that mean, exactly?</h3>
  * <p>
  * It means Cobertura will look at each class you give it.  It
  * loads the bytecode into memory.  For each line of source,
- * Cobertura adds a few extra instructions.  These instructions 
+ * Cobertura adds a few extra instructions.  These instructions
  * do the following:
  * </p>
- * 
+ * <p/>
  * <ol>
  * <li>Get an instance of the ProjectData class.</li>
  * <li>Call a method in this ProjectData class that increments
  * a counter for this line of code.
  * </ol>
- *
+ * <p/>
  * <p>
  * After every line in a class has been "instrumented," Cobertura
  * edits the bytecode for the class one more time and adds
- * "implements net.sourceforge.cobertura.coveragedata.HasBeenInstrumented" 
+ * "implements net.sourceforge.cobertura.coveragedata.HasBeenInstrumented"
  * This is basically just a flag used internally by Cobertura to
  * determine whether a class has been instrumented or not, so
  * as not to instrument the same class twice.
  * </p>
  */
-public class Main
-{
+public class Main {
 
-	private static final LoggerWrapper logger = new LoggerWrapper();
+    private static final LoggerWrapper logger = new LoggerWrapper();
 
-	private File destinationDirectory = null;
+    private File destinationDirectory = null;
 
-	private Collection ignoreRegexes = new Vector();
+    private Collection ignoreRegexes = new Vector();
 
-	private Collection ignoreBranchesRegexes = new Vector();
+    private Collection ignoreBranchesRegexes = new Vector();
 
-	private Collection ignoreMethodAnnotations = new HashSet();
+    private Collection ignoreMethodAnnotations = new HashSet();
 
-	private ClassPattern classPattern = new ClassPattern();
+    private ClassPattern classPattern = new ClassPattern();
 
-	private boolean ignoreTrivial = false;
-	
-	private ProjectData projectData = null;
+    private boolean ignoreTrivial = false;
 
-	/**
-	 * @param entry A zip entry.
-	 * @return True if the specified entry has "class" as its extension,
-	 * false otherwise.
-	 */
-	private static boolean isClass(ZipEntry entry)
-	{
-		return entry.getName().endsWith(".class");
-	}
+    private ProjectData projectData = null;
 
-	private boolean addInstrumentationToArchive(CoberturaFile file, InputStream archive,
-			OutputStream output) throws Throwable
-	{
-		ZipInputStream zis = null;
-		ZipOutputStream zos = null;
+    /**
+     * @param entry A zip entry.
+     * @return True if the specified entry has "class" as its extension,
+     *         false otherwise.
+     */
+    private static boolean isClass(ZipEntry entry) {
+        return entry.getName().endsWith(".class");
+    }
 
-		try
-		{
-			zis = new ZipInputStream(archive);
-			zos = new ZipOutputStream(output);
-			return addInstrumentationToArchive(file, zis, zos);
-		}
-		finally
-		{
-			zis = (ZipInputStream)IOUtil.closeInputStream(zis);
-			zos = (ZipOutputStream)IOUtil.closeOutputStream(zos);
-		}
-	}
+    private boolean addInstrumentationToArchive(CoberturaFile file, InputStream archive,
+                                                OutputStream output) throws Throwable {
+        ZipInputStream zis = null;
+        ZipOutputStream zos = null;
 
-	private boolean addInstrumentationToArchive(CoberturaFile file, ZipInputStream archive,
-			ZipOutputStream output) throws Throwable
-	{
-		/*
+        try {
+            zis = new ZipInputStream(archive);
+            zos = new ZipOutputStream(output);
+            return addInstrumentationToArchive(file, zis, zos);
+        } finally {
+            zis = (ZipInputStream) IOUtil.closeInputStream(zis);
+            zos = (ZipOutputStream) IOUtil.closeOutputStream(zos);
+        }
+    }
+
+    private boolean addInstrumentationToArchive(CoberturaFile file, ZipInputStream archive,
+                                                ZipOutputStream output) throws Throwable {        /*
 		 * "modified" is returned and indicates that something was instrumented.
 		 * If nothing is instrumented, the original entry will be used by the
 		 * caller of this method.
 		 */
-		boolean modified = false;
-		ZipEntry entry;
-		while ((entry = archive.getNextEntry()) != null)
-		{
-			try
-			{
-				String entryName = entry.getName();
+        boolean modified = false;
+        ZipEntry entry;
+        while ((entry = archive.getNextEntry()) != null) {
+            try {
+                String entryName = entry.getName();
 
 				/*
 				 * If this is a signature file then don't copy it,
@@ -157,412 +147,327 @@ public class Main
 				 * thing we do is strip the signature, just use
 				 * the original entry.
 				 */
-				if (ArchiveUtil.isSignatureFile(entry.getName()))
-				{
-					continue;
-				}
-				ZipEntry outputEntry = new ZipEntry(entry.getName());
-				outputEntry.setComment(entry.getComment());
-				outputEntry.setExtra(entry.getExtra());
-				outputEntry.setTime(entry.getTime());
-				output.putNextEntry(outputEntry);
+                if (ArchiveUtil.isSignatureFile(entry.getName())) {
+                    continue;
+                }
+                ZipEntry outputEntry = new ZipEntry(entry.getName());
+                outputEntry.setComment(entry.getComment());
+                outputEntry.setExtra(entry.getExtra());
+                outputEntry.setTime(entry.getTime());
+                output.putNextEntry(outputEntry);
 
-				// Read current entry
-				byte[] entryBytes = IOUtil
-						.createByteArrayFromInputStream(archive);
+                // Read current entry
+                byte[] entryBytes = IOUtil
+                        .createByteArrayFromInputStream(archive);
 
-				// Instrument embedded archives if a classPattern has been specified
-				if ((classPattern.isSpecified()) && ArchiveUtil.isArchive(entryName))
-				{
-					Archive archiveObj = new Archive(file, entryBytes);
-					addInstrumentationToArchive(archiveObj);
-					if (archiveObj.isModified())
-					{
-						modified = true;
-						entryBytes = archiveObj.getBytes();
-						outputEntry.setTime(System.currentTimeMillis());
-					}
-				}
-				else if (isClass(entry) && classPattern.matches(entryName))
-				{
-					try
-					{
-						// Instrument class
-						ClassReader cr = new ClassReader(entryBytes);
-						ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-						ClassInstrumenter cv = new ClassInstrumenter(projectData,
-								cw, ignoreRegexes, ignoreBranchesRegexes,
-								ignoreMethodAnnotations, ignoreTrivial);
-						cr.accept(cv, 0);
-	
-						// If class was instrumented, get bytes that define the
-						// class
-						if (cv.isInstrumented())
-						{
-							logger.debug("Putting instrumented entry: "
-									+ entry.getName());
-							entryBytes = cw.toByteArray();
-							modified = true;
-							outputEntry.setTime(System.currentTimeMillis());
-						}
-					}
-					catch (Throwable t)
-					{
-						if (entry.getName().endsWith("_Stub.class"))
-						{
-							//no big deal - it is probably an RMI stub, and they don't need to be instrumented
-							logger.debug("Problems instrumenting archive entry: " + entry.getName(), t);
-						}
-						else
-						{
-							logger.warn("Problems instrumenting archive entry: " + entry.getName(), t);
-						}
-					}
-				}
+                // Instrument embedded archives if a classPattern has been specified
+                if ((classPattern.isSpecified()) && ArchiveUtil.isArchive(entryName)) {
+                    Archive archiveObj = new Archive(file, entryBytes);
+                    addInstrumentationToArchive(archiveObj);
+                    if (archiveObj.isModified()) {
+                        modified = true;
+                        entryBytes = archiveObj.getBytes();
+                        outputEntry.setTime(System.currentTimeMillis());
+                    }
+                } else if (isClass(entry) && classPattern.matches(entryName)) {
+                    try {
+                        // Instrument class
+                        ClassReader cr = new ClassReader(entryBytes);
+                        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+                        ClassInstrumenter cv = new ClassInstrumenter(projectData,
+                                cw, ignoreRegexes, ignoreBranchesRegexes,
+                                ignoreMethodAnnotations, ignoreTrivial);
+                        cr.accept(cv, 0);
 
-				// Add entry to the output
-				output.write(entryBytes);
-				output.closeEntry();
-				archive.closeEntry();
-			}
-			catch (Exception e)
-			{
-				logger.warn("Problems with archive entry: " + entry.getName(), e);
-			}
-			catch (Throwable t)
-			{
-				logger.warn("Problems with archive entry: " + entry.getName(), t);
-			}
-			output.flush();
-		}
-		return modified;
-	}
+                        // If class was instrumented, get bytes that define the
+                        // class
+                        if (cv.isInstrumented()) {
+                            logger.debug("Putting instrumented entry: "
+                                    + entry.getName());
+                            entryBytes = cw.toByteArray();
+                            modified = true;
+                            outputEntry.setTime(System.currentTimeMillis());
+                        }
+                    } catch (Throwable t) {
+                        if (entry.getName().endsWith("_Stub.class")) {
+                            //no big deal - it is probably an RMI stub, and they don't need to be instrumented
+                            logger.debug("Problems instrumenting archive entry: " + entry.getName(), t);
+                        } else {
+                            logger.warn("Problems instrumenting archive entry: " + entry.getName(), t);
+                        }
+                    }
+                }
 
-	private void addInstrumentationToArchive(Archive archive) throws Throwable
-	{
-		InputStream in = null;
-		ByteArrayOutputStream out = null;
-		try
-		{
-			in = archive.getInputStream();
-			out = new ByteArrayOutputStream();
-			boolean modified = addInstrumentationToArchive(archive.getCoberturaFile(), in, out);
+                // Add entry to the output
+                output.write(entryBytes);
+                output.closeEntry();
+                archive.closeEntry();
+            } catch (Exception e) {
+                logger.warn("Problems with archive entry: " + entry.getName(), e);
+            } catch (Throwable t) {
+                logger.warn("Problems with archive entry: " + entry.getName(), t);
+            }
+            output.flush();
+        }
+        return modified;
+    }
 
-			if (modified)
-			{
-				out.flush();
-				byte[] bytes = out.toByteArray();
-				archive.setModifiedBytes(bytes);
-			}
-		}
-		finally
-		{
-			in = IOUtil.closeInputStream(in);
-			out = (ByteArrayOutputStream)IOUtil.closeOutputStream(out);
-		}
-	}
+    private void addInstrumentationToArchive(Archive archive) throws Throwable {
+        InputStream in = null;
+        ByteArrayOutputStream out = null;
+        try {
+            in = archive.getInputStream();
+            out = new ByteArrayOutputStream();
+            boolean modified = addInstrumentationToArchive(archive.getCoberturaFile(), in, out);
 
-	private void addInstrumentationToArchive(CoberturaFile archive) throws Throwable
-	{
-		logger.debug("Instrumenting archive " + archive.getAbsolutePath());
+            if (modified) {
+                out.flush();
+                byte[] bytes = out.toByteArray();
+                archive.setModifiedBytes(bytes);
+            }
+        } finally {
+            in = IOUtil.closeInputStream(in);
+            out = (ByteArrayOutputStream) IOUtil.closeOutputStream(out);
+        }
+    }
 
-		File outputFile = null;
-		ZipInputStream input = null;
-		ZipOutputStream output = null;
-		boolean modified = false;
-		try
-		{
-			// Open archive
-			try
-			{
-				input = new ZipInputStream(new FileInputStream(archive));
-			}
-			catch (FileNotFoundException e)
-			{
-				logger.warn("Cannot open archive file: "
-						+ archive.getAbsolutePath(), e);
-				return;
-			}
+    private void addInstrumentationToArchive(CoberturaFile archive) throws Throwable {
+        logger.debug("Instrumenting archive " + archive.getAbsolutePath());
 
-			// Open output archive
-			try
-			{
-				// check if destination folder is set
-				if (destinationDirectory != null)
-				{
-					// if so, create output file in it
-					outputFile = new File(destinationDirectory, archive.getPathname());
-				}
-				else
-				{
-					// otherwise create output file in temporary location
-					outputFile = File.createTempFile(
-							"CoberturaInstrumentedArchive", "jar");
-					outputFile.deleteOnExit();
-				}
-				output = new ZipOutputStream(new FileOutputStream(outputFile));
-			}
-			catch (IOException e)
-			{
-				logger.warn("Cannot open file for instrumented archive: "
-						+ archive.getAbsolutePath(), e);
-				return;
-			}
+        File outputFile = null;
+        ZipInputStream input = null;
+        ZipOutputStream output = null;
+        boolean modified = false;
+        try {
+            // Open archive
+            try {
+                input = new ZipInputStream(new FileInputStream(archive));
+            } catch (FileNotFoundException e) {
+                logger.warn("Cannot open archive file: "
+                        + archive.getAbsolutePath(), e);
+                return;
+            }
 
-			// Instrument classes in archive
-			try
-			{
-				modified = addInstrumentationToArchive(archive, input, output);
-			}
-			catch (Throwable e)
-			{
-				logger.warn("Cannot instrument archive: "
-						+ archive.getAbsolutePath(), e);
-				return;
-			}
-		}
-		finally
-		{
-			input = (ZipInputStream)IOUtil.closeInputStream(input);
-			output = (ZipOutputStream)IOUtil.closeOutputStream(output);
-		}
+            // Open output archive
+            try {
+                // check if destination folder is set
+                if (destinationDirectory != null) {
+                    // if so, create output file in it
+                    outputFile = new File(destinationDirectory, archive.getPathname());
+                } else {
+                    // otherwise create output file in temporary location
+                    outputFile = File.createTempFile(
+                            "CoberturaInstrumentedArchive", "jar");
+                    outputFile.deleteOnExit();
+                }
+                output = new ZipOutputStream(new FileOutputStream(outputFile));
+            } catch (IOException e) {
+                logger.warn("Cannot open file for instrumented archive: "
+                        + archive.getAbsolutePath(), e);
+                return;
+            }
 
-		// If destination folder was not set, overwrite orginal archive with
-		// instrumented one
-		if (modified && (destinationDirectory == null))
-		{
-			try
-			{
-				logger.debug("Moving " + outputFile.getAbsolutePath() + " to "
-						+ archive.getAbsolutePath());
-				IOUtil.moveFile(outputFile, archive);
-			}
-			catch (IOException e)
-			{
-				logger.warn("Cannot instrument archive: "
-						+ archive.getAbsolutePath(), e);
-				return;
-			}
-		}
-		if ((destinationDirectory != null) && (!modified))
-		{
-			outputFile.delete();
-		}
-	}
+            // Instrument classes in archive
+            try {
+                modified = addInstrumentationToArchive(archive, input, output);
+            } catch (Throwable e) {
+                logger.warn("Cannot instrument archive: "
+                        + archive.getAbsolutePath(), e);
+                return;
+            }
+        } finally {
+            input = (ZipInputStream) IOUtil.closeInputStream(input);
+            output = (ZipOutputStream) IOUtil.closeOutputStream(output);
+        }
 
-	private void addInstrumentationToSingleClass(File file) throws Throwable
-	{
-		logger.debug("Instrumenting class " + file.getAbsolutePath());
+        // If destination folder was not set, overwrite orginal archive with
+        // instrumented one
+        if (modified && (destinationDirectory == null)) {
+            try {
+                logger.debug("Moving " + outputFile.getAbsolutePath() + " to "
+                        + archive.getAbsolutePath());
+                IOUtil.moveFile(outputFile, archive);
+            } catch (IOException e) {
+                logger.warn("Cannot instrument archive: "
+                        + archive.getAbsolutePath(), e);
+                return;
+            }
+        }
+        if ((destinationDirectory != null) && (!modified)) {
+            outputFile.delete();
+        }
+    }
 
-		InputStream inputStream = null;
-		ClassWriter cw;
-		ClassInstrumenter cv;
-		try
-		{
-			inputStream = new FileInputStream(file);
-			ClassReader cr = new ClassReader(inputStream);
-			cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-			cv = new ClassInstrumenter(projectData, cw, ignoreRegexes, ignoreBranchesRegexes,
-	                   ignoreMethodAnnotations, ignoreTrivial);
-			cr.accept(cv, 0);
-		}
-		catch (Throwable t)
-		{
-			logger.warn("Unable to instrument file " + file.getAbsolutePath(),
-					t);
-			return;
-		}
-		finally
-		{
-			inputStream = IOUtil.closeInputStream(inputStream);
-		}
+    private void addInstrumentationToSingleClass(File file) throws Throwable {
+        logger.debug("Instrumenting class " + file.getAbsolutePath());
 
-		OutputStream outputStream = null;
-		try
-		{
-			if (cv.isInstrumented())
-			{
-				// If destinationDirectory is null, then overwrite
-				// the original, uninstrumented file.
-				File outputFile;
-				if (destinationDirectory == null)
-					outputFile = file;
-				else
-					outputFile = new File(destinationDirectory, cv
-							.getClassName().replace('.', File.separatorChar)
-							+ ".class");
+        InputStream inputStream = null;
+        ClassWriter cw;
+        ClassInstrumenter cv;
+        try {
+            inputStream = new FileInputStream(file);
+            ClassReader cr = new ClassReader(inputStream);
+            cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+            cv = new ClassInstrumenter(projectData, cw, ignoreRegexes, ignoreBranchesRegexes,
+                    ignoreMethodAnnotations, ignoreTrivial);
+            cr.accept(cv, 0);
+        } catch (Throwable t) {
+            logger.warn("Unable to instrument file " + file.getAbsolutePath(),
+                    t);
+            return;
+        } finally {
+            inputStream = IOUtil.closeInputStream(inputStream);
+        }
 
-				File parentFile = outputFile.getParentFile();
-				if (parentFile != null)
-				{
-					parentFile.mkdirs();
-				}
+        OutputStream outputStream = null;
+        try {
+            if (cv.isInstrumented()) {
+                // If destinationDirectory is null, then overwrite
+                // the original, uninstrumented file.
+                File outputFile;
+                if (destinationDirectory == null)
+                    outputFile = file;
+                else
+                    outputFile = new File(destinationDirectory, cv
+                            .getClassName().replace('.', File.separatorChar)
+                            + ".class");
 
-				byte[] instrumentedClass = cw.toByteArray();
-				outputStream = new FileOutputStream(outputFile);
-				outputStream.write(instrumentedClass);
-			}
-		}
-		catch (Throwable t)
-		{
-			logger.warn("Unable to instrument file " + file.getAbsolutePath(),
-					t);
-			return;
-		}
-		finally
-		{
-			outputStream = IOUtil.closeOutputStream(outputStream);
-		}
-	}
+                File parentFile = outputFile.getParentFile();
+                if (parentFile != null) {
+                    parentFile.mkdirs();
+                }
 
-	// TODO: Don't attempt to instrument a file if the outputFile already
-	//       exists and is newer than the input file, and the output and
-	//       input file are in different locations?
-	private void addInstrumentation(CoberturaFile coberturaFile) throws Throwable
-	{
-		if (coberturaFile.isClass() && classPattern.matches(coberturaFile.getPathname()))
-		{
-			addInstrumentationToSingleClass(coberturaFile);
-		}
-		else if (coberturaFile.isDirectory())
-		{
-			String[] contents = coberturaFile.list();
-			for (int i = 0; i < contents.length; i++)
-			{
-				File relativeFile = new File(coberturaFile.getPathname(), contents[i]);
-				CoberturaFile relativeCoberturaFile = new CoberturaFile(coberturaFile.getBaseDir(),
-						relativeFile.toString());
-				//recursion!
-				addInstrumentation(relativeCoberturaFile);
-			}
-		}
-	}
+                byte[] instrumentedClass = cw.toByteArray();
+                outputStream = new FileOutputStream(outputFile);
+                outputStream.write(instrumentedClass);
+            }
+        } catch (Throwable t) {
+            logger.warn("Unable to instrument file " + file.getAbsolutePath(),
+                    t);
+            return;
+        } finally {
+            outputStream = IOUtil.closeOutputStream(outputStream);
+        }
+    }
 
-	private void parseArguments(String[] args) throws Throwable
-	{
-		File dataFile = CoverageDataFileHandler.getDefaultDataFile();
+    // TODO: Don't attempt to instrument a file if the outputFile already
+    //       exists and is newer than the input file, and the output and
+    //       input file are in different locations?
+    private void addInstrumentation(CoberturaFile coberturaFile) throws Throwable {
+        if (coberturaFile.isClass() && classPattern.matches(coberturaFile.getPathname())) {
+            addInstrumentationToSingleClass(coberturaFile);
+        } else if (coberturaFile.isDirectory()) {
+            String[] contents = coberturaFile.list();
+            for (int i = 0; i < contents.length; i++) {
+                File relativeFile = new File(coberturaFile.getPathname(), contents[i]);
+                CoberturaFile relativeCoberturaFile = new CoberturaFile(coberturaFile.getBaseDir(),
+                        relativeFile.toString());
+                //recursion!
+                addInstrumentation(relativeCoberturaFile);
+            }
+        }
+    }
 
-		// Parse our parameters
-		List filePaths = new ArrayList();
-		String baseDir = null;
-		for (int i = 0; i < args.length; i++)
-		{
-			if (args[i].equals("--basedir"))
-				baseDir = args[++i];
-			else if (args[i].equals("--datafile"))
-				dataFile = new File(args[++i]);
-			else if (args[i].equals("--destination"))
-				destinationDirectory = new File(args[++i]);
-			else if (args[i].equals("--ignore"))
-			{
-				RegexUtil.addRegex(ignoreRegexes, args[++i]);
-			}
-			else if (args[i].equals("--ignoreBranches"))
-			{
-				RegexUtil.addRegex(ignoreBranchesRegexes, args[++i]);
-			}
-			else if (args[i].equals("--ignoreMethodAnnotation")) {
-				ignoreMethodAnnotations.add(args[++i]);
-			}
-			else if (args[i].equals("--ignoreTrivial")) {
-				ignoreTrivial = true;
-			}
-			else if (args[i].equals("--includeClasses"))
-			{
-				classPattern.addIncludeClassesRegex(args[++i]);
-			}
-			else if (args[i].equals("--excludeClasses"))
-			{
-				classPattern.addExcludeClassesRegex(args[++i]);
-			}
-			else if (args[i].equals("--failOnError"))
-			{
-				logger.setFailOnError(true);
-			}
-			else
-			{
-				CoberturaFile coberturaFile = new CoberturaFile(baseDir, args[i]);
-				filePaths.add(coberturaFile);
-			}
-		}
+    private void parseArguments(String[] args) throws Throwable {
+        File dataFile = CoverageDataFileHandler.getDefaultDataFile();
 
-		// Load coverage data
-		if (dataFile.isFile())
-			projectData = CoverageDataFileHandler.loadCoverageData(dataFile);
-		if (projectData == null)
-			projectData = new ProjectData();
-		
-		// Instrument classes
-		System.out.println("Instrumenting "	+ filePaths.size() + " "
-				+ (filePaths.size() == 1 ? "file" : "files")
-				+ (destinationDirectory != null ? " to "
-						+ destinationDirectory.getAbsoluteFile() : ""));
+        // Parse our parameters
+        List filePaths = new ArrayList();
+        String baseDir = null;
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--basedir"))
+                baseDir = args[++i];
+            else if (args[i].equals("--datafile"))
+                dataFile = new File(args[++i]);
+            else if (args[i].equals("--destination"))
+                destinationDirectory = new File(args[++i]);
+            else if (args[i].equals("--ignore")) {
+                RegexUtil.addRegex(ignoreRegexes, args[++i]);
+            } else if (args[i].equals("--ignoreBranches")) {
+                RegexUtil.addRegex(ignoreBranchesRegexes, args[++i]);
+            } else if (args[i].equals("--ignoreMethodAnnotation")) {
+                ignoreMethodAnnotations.add(args[++i]);
+            } else if (args[i].equals("--ignoreTrivial")) {
+                ignoreTrivial = true;
+            } else if (args[i].equals("--includeClasses")) {
+                classPattern.addIncludeClassesRegex(args[++i]);
+            } else if (args[i].equals("--excludeClasses")) {
+                classPattern.addExcludeClassesRegex(args[++i]);
+            } else if (args[i].equals("--failOnError")) {
+                logger.setFailOnError(true);
+            } else {
+                CoberturaFile coberturaFile = new CoberturaFile(baseDir, args[i]);
+                filePaths.add(coberturaFile);
+            }
+        }
 
-		Iterator iter = filePaths.iterator();
-		while (iter.hasNext())
-		{
-			CoberturaFile coberturaFile = (CoberturaFile)iter.next();
-			if (coberturaFile.isArchive())
-			{
-				addInstrumentationToArchive(coberturaFile);
-			}
-			else
-			{
-				addInstrumentation(coberturaFile);
-			}
-		}
+        // Load coverage data
+        if (dataFile.isFile())
+            projectData = CoverageDataFileHandler.loadCoverageData(dataFile);
+        if (projectData == null)
+            projectData = new ProjectData();
 
-		// Save coverage data
-		CoverageDataFileHandler.saveCoverageData(projectData, dataFile);
-	}
+        // Instrument classes
+        System.out.println("Instrumenting " + filePaths.size() + " "
+                + (filePaths.size() == 1 ? "file" : "files")
+                + (destinationDirectory != null ? " to "
+                + destinationDirectory.getAbsoluteFile() : ""));
 
-	public static void main(String[] args) throws Throwable
-	{
-		Header.print(System.out);
+        Iterator iter = filePaths.iterator();
+        while (iter.hasNext()) {
+            CoberturaFile coberturaFile = (CoberturaFile) iter.next();
+            if (coberturaFile.isArchive()) {
+                addInstrumentationToArchive(coberturaFile);
+            } else {
+                addInstrumentation(coberturaFile);
+            }
+        }
 
-		long startTime = System.currentTimeMillis();
+        // Save coverage data
+        CoverageDataFileHandler.saveCoverageData(projectData, dataFile);
+    }
 
-		Main main = new Main();
+    public static void main(String[] args) throws Throwable {
+        Header.print(System.out);
 
-		try {
-			args = CommandLineBuilder.preprocessCommandLineArguments( args);
-		} catch( Exception ex) {
-			System.err.println( "Error: Cannot process arguments: " + ex.getMessage());
-			System.exit(1);
-		}
-		main.parseArguments(args);
+        long startTime = System.currentTimeMillis();
 
-		long stopTime = System.currentTimeMillis();
-		System.out.println("Instrument time: " + (stopTime - startTime) + "ms");
-	}
+        Main main = new Main();
 
-	private static class LoggerWrapper {
-		private final Logger logger = Logger.getLogger(Main.class);
+        try {
+            args = CommandLineBuilder.preprocessCommandLineArguments(args);
+        } catch (Exception ex) {
+            System.err.println("Error: Cannot process arguments: " + ex.getMessage());
+            System.exit(1);
+        }
+        main.parseArguments(args);
 
-		private boolean failOnError = false;
+        long stopTime = System.currentTimeMillis();
+        System.out.println("Instrument time: " + (stopTime - startTime) + "ms");
+    }
 
-		public void setFailOnError(boolean failOnError)
-		{
-			this.failOnError = failOnError;
-		}
+    private static class LoggerWrapper {
+        private final Logger logger = Logger.getLogger(Main.class);
 
-		public void debug(String message)
-		{
-			logger.debug(message);
-		}
+        private boolean failOnError = false;
 
-		public void debug(String message, Throwable t)
-		{
-			logger.debug(message, t);
-		}
+        public void setFailOnError(boolean failOnError) {
+            this.failOnError = failOnError;
+        }
 
-		public void warn(String message, Throwable t) throws Throwable
-		{
-			logger.warn(message, t);
-			if (failOnError) 
-			{
-				throw t;
-			}
-		}
-	}
+        public void debug(String message) {
+            logger.debug(message);
+        }
+
+        public void debug(String message, Throwable t) {
+            logger.debug(message, t);
+        }
+
+        public void warn(String message, Throwable t) throws Throwable {
+            logger.warn(message, t);
+            if (failOnError) {
+                throw t;
+            }
+        }
+    }
 }

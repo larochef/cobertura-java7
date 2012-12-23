@@ -68,11 +68,11 @@ import java.util.Map;
  * this class is the brain. This class controls input and output and
  * invokes the Java parser.
  *
- * @author    Chr. Clemens Lee <clemens@kclee.com>
- *            , recursive feature by Pääkö Hannu
- *            , additional javadoc metrics by Emilio Gongora <emilio@sms.nl>
- *            , and Guillermo Rodriguez <guille@sms.nl>.
- * @version   $Id: Javancss.java 676 2009-09-04 13:42:13Z lewijw $
+ * @author Chr. Clemens Lee <clemens@kclee.com>
+ *         , recursive feature by Pääkö Hannu
+ *         , additional javadoc metrics by Emilio Gongora <emilio@sms.nl>
+ *         , and Guillermo Rodriguez <guille@sms.nl>.
+ * @version $Id: Javancss.java 676 2009-09-04 13:42:13Z lewijw $
  */
 public class Javancss {
 
@@ -81,7 +81,7 @@ public class Javancss {
     private String _sErrorMessage = null;
     private JavaParserInterface _pJavaParser = null;
     private List<FunctionMetric> _vFunctionMetrics = new ArrayList<FunctionMetric>();
-    private Map<String,PackageMetric> _htPackages = null;
+    private Map<String, PackageMetric> _htPackages = null;
     private Object[] _aoPackage = null;
     private Init _pInit = null;
 
@@ -98,11 +98,11 @@ public class Javancss {
 
         try {
             _measureRoot(reader);
-        } catch(Exception e) {
-            Util.debug( "Javancss.<init>(InputStream).e: " + e );
+        } catch (Exception e) {
+            Util.debug("Javancss.<init>(InputStream).e: " + e);
             e.printStackTrace();
-        } catch(TokenMgrError pError) {
-            Util.debug( "Javancss.<init>(InputStream).pError: " + pError );
+        } catch (TokenMgrError pError) {
+            Util.debug("Javancss.<init>(InputStream).pError: " + pError);
             pError.printStackTrace();
         }
     }
@@ -130,18 +130,16 @@ public class Javancss {
         return newReader(new FileInputStream(file), encoding);
     }
 
-    private void _measureSource( File sSourceFile_ ) throws Exception {
+    private void _measureSource(File sSourceFile_) throws Exception {
         Reader reader;
 
         // opens the file
         try {
             reader = newReader(sSourceFile_, this.encoding);
-        }
-        catch ( IOException pIOException ) {
-            if ( Util.isEmpty( _sErrorMessage ) ) {
+        } catch (IOException pIOException) {
+            if (Util.isEmpty(_sErrorMessage)) {
                 _sErrorMessage = "";
-            }
-            else {
+            } else {
                 _sErrorMessage += "\n";
             }
             _sErrorMessage += "File not found: " + sSourceFile_.getAbsolutePath();
@@ -150,12 +148,11 @@ public class Javancss {
         }
 
         String sTempErrorMessage = _sErrorMessage;
-        try  {
+        try {
             // the same method but with a Reader
             _measureSource(reader);
-        }
-        catch ( Exception pParseException ) {
-            if ( sTempErrorMessage == null ) {
+        } catch (Exception pParseException) {
+            if (sTempErrorMessage == null) {
                 sTempErrorMessage = "";
             }
             sTempErrorMessage += "ParseException in " + sSourceFile_.getAbsolutePath() +
@@ -165,10 +162,8 @@ public class Javancss {
             _sErrorMessage = sTempErrorMessage;
 
             throw pParseException;
-        }
-        catch ( Error pTokenMgrError ) {
-            if ( sTempErrorMessage == null )
-            {
+        } catch (Error pTokenMgrError) {
+            if (sTempErrorMessage == null) {
                 sTempErrorMessage = "";
             }
             sTempErrorMessage += "TokenMgrError in " + sSourceFile_.getAbsolutePath() +
@@ -179,31 +174,29 @@ public class Javancss {
         }
     }
 
-    private void _measureSource( Reader reader ) throws Exception {
+    private void _measureSource(Reader reader) throws Exception {
         Util.debug("_measureSource(Reader).ENTER");
         //Util.debug( "_measureSource(Reader).parser15: -->" + (_pInit.getOptions().get( "parser15" ) + "<--" );
         //Util.panicIf( _pInit == null );
         //Util.panicIf( _pInit.getOptions() == null );
-        Util.debug( "_measureSource(Reader).ENTER2" );
+        Util.debug("_measureSource(Reader).ENTER2");
         try {
             // create a parser object
             if (!Util.isDebug()) {
-                if ( _pInit == null || _pInit.getOptions() == null || _pInit.getOptions().get( "parser15" ) == null ) {
-                    Util.debug( "creating JavaParser" );
+                if (_pInit == null || _pInit.getOptions() == null || _pInit.getOptions().get("parser15") == null) {
+                    Util.debug("creating JavaParser");
                     _pJavaParser = new JavaParser(reader);
                 } else {
-                    Util.debug( "creating JavaParser15" );
+                    Util.debug("creating JavaParser15");
                     _pJavaParser = new JavaParser15(reader);
                 }
-            }
-            else {
-                if ( _pInit == null || _pInit.getOptions() == null || _pInit.getOptions().get( "parser15" ) == null ) {
-                    Util.debug( "creating JavaParserDebug" );
-                    Util.println( "creating JavaParserDebug" );
+            } else {
+                if (_pInit == null || _pInit.getOptions() == null || _pInit.getOptions().get("parser15") == null) {
+                    Util.debug("creating JavaParserDebug");
+                    Util.println("creating JavaParserDebug");
                     _pJavaParser = new JavaParserDebug(reader);
-                }
-                else {
-                    Util.debug( "creating JavaParser15Debug" );
+                } else {
+                    Util.debug("creating JavaParser15Debug");
                     _pJavaParser = new JavaParser15Debug(reader);
                 }
             }
@@ -213,7 +206,7 @@ public class Javancss {
             Util.debug("Javancss._measureSource(DataInputStream).SUCCESSFULLY_PARSED");
 
             // add new data to global vector
-            _vFunctionMetrics.addAll(_pJavaParser.getFunction() );
+            _vFunctionMetrics.addAll(_pJavaParser.getFunction());
             Map<String, PackageMetric> htNewPackages = _pJavaParser.getPackage();
 
             /* List vNewPackages = new Vector(); */
@@ -225,8 +218,7 @@ public class Javancss {
                 pckmNext.add(pckmPrevious);
                 _htPackages.put(sPackage, pckmNext);
             }
-        }
-        catch (Exception pParseException) {
+        } catch (Exception pParseException) {
             if (_sErrorMessage == null) {
                 _sErrorMessage = "";
             }
@@ -237,9 +229,8 @@ public class Javancss {
             _sErrorMessage += pParseException.getMessage() + "\n";
 
             throw pParseException;
-        }
-        catch ( Error pTokenMgrError ) {
-            if ( _sErrorMessage == null ) {
+        } catch (Error pTokenMgrError) {
+            if (_sErrorMessage == null) {
                 _sErrorMessage = "";
             }
             _sErrorMessage += "TokenMgrError in STDIN\n";
@@ -253,9 +244,8 @@ public class Javancss {
         // for each file
         for (File file : vJavaSourceFiles) {
             try {
-                _measureSource( file );
-            }
-            catch ( Throwable pThrowable ) {
+                _measureSource(file);
+            } catch (Throwable pThrowable) {
                 // hmm, do nothing? Use getLastError() or so to check for details.
             }
         }
@@ -265,16 +255,15 @@ public class Javancss {
      * If arguments were provided, they are used, otherwise
      * the input stream is used.
      */
-    private void _measureRoot( Reader reader ) throws Exception {
+    private void _measureRoot(Reader reader) throws Exception {
         _htPackages = new HashMap<String, PackageMetric>();
 
         // either there are argument files, or stdin is used
-        if ( _vJavaSourceFiles == null ) {
-            _measureSource( reader );
-        }
-        else {
+        if (_vJavaSourceFiles == null) {
+            _measureSource(reader);
+        } else {
             // the collection of files get measured
-            _measureFiles( _vJavaSourceFiles );
+            _measureFiles(_vJavaSourceFiles);
         }
     }
 

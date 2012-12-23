@@ -76,83 +76,75 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 
-public class InstrumentTask extends CommonMatchingTask
-{
+public class InstrumentTask extends CommonMatchingTask {
 
-	private String dataFile = null;
+    private String dataFile = null;
 
-	private File toDir = null;
+    private File toDir = null;
 
-	List ignoreRegexs = new ArrayList();
+    List ignoreRegexs = new ArrayList();
 
-	List ignoreBranchesRegexs = new ArrayList();
-	
-	List ignoreMethodAnnotations = new ArrayList();
+    List ignoreBranchesRegexs = new ArrayList();
 
-	List includeClassesRegexs = new ArrayList();
+    List ignoreMethodAnnotations = new ArrayList();
 
-	List excludeClassesRegexs = new ArrayList();
+    List includeClassesRegexs = new ArrayList();
 
-	boolean ignoreTrivial = false;
+    List excludeClassesRegexs = new ArrayList();
 
-	private Integer forkedJVMDebugPort;
-	
-	private Path instrumentationClasspath = null;
+    boolean ignoreTrivial = false;
 
-	private HashMap fileSetMap = new HashMap();
+    private Integer forkedJVMDebugPort;
 
-	public InstrumentTask()
-	{
-		super("net.sourceforge.cobertura.instrument.Main");
-	}
+    private Path instrumentationClasspath = null;
 
-	public Ignore createIgnore()
-	{
-		Ignore ignoreRegex = new Ignore();
-		ignoreRegexs.add(ignoreRegex);
-		return ignoreRegex;
-	}
+    private HashMap fileSetMap = new HashMap();
 
-	public IgnoreBranches createIgnoreBranches()
-	{
-		IgnoreBranches ignoreBranchesRegex = new IgnoreBranches();
-		ignoreBranchesRegexs.add(ignoreBranchesRegex);
-		return ignoreBranchesRegex;
-	}
+    public InstrumentTask() {
+        super("net.sourceforge.cobertura.instrument.Main");
+    }
 
-	
-	public IgnoreMethodAnnotation createIgnoreMethodAnnotation()
-	{
-		IgnoreMethodAnnotation ignoreAnnotation = new IgnoreMethodAnnotation();
-		ignoreMethodAnnotations.add(ignoreAnnotation);
-		return ignoreAnnotation;
-	}
-	
-	
-	public IncludeClasses createIncludeClasses()
-	{
-		IncludeClasses includeClassesRegex = new IncludeClasses();
-		includeClassesRegexs.add(includeClassesRegex);
-		return includeClassesRegex;
-	}
+    public Ignore createIgnore() {
+        Ignore ignoreRegex = new Ignore();
+        ignoreRegexs.add(ignoreRegex);
+        return ignoreRegex;
+    }
 
-	public ExcludeClasses createExcludeClasses()
-	{
-		ExcludeClasses excludeClassesRegex = new ExcludeClasses();
-		excludeClassesRegexs.add(excludeClassesRegex);
-		return excludeClassesRegex;
-	}
+    public IgnoreBranches createIgnoreBranches() {
+        IgnoreBranches ignoreBranchesRegex = new IgnoreBranches();
+        ignoreBranchesRegexs.add(ignoreBranchesRegex);
+        return ignoreBranchesRegex;
+    }
 
-	public Path createInstrumentationClasspath()
-	{
-		if (instrumentationClasspath == null) {
-			instrumentationClasspath = new Path(getProject());
-		}
-		return instrumentationClasspath.createPath();
-	}
+
+    public IgnoreMethodAnnotation createIgnoreMethodAnnotation() {
+        IgnoreMethodAnnotation ignoreAnnotation = new IgnoreMethodAnnotation();
+        ignoreMethodAnnotations.add(ignoreAnnotation);
+        return ignoreAnnotation;
+    }
+
+
+    public IncludeClasses createIncludeClasses() {
+        IncludeClasses includeClassesRegex = new IncludeClasses();
+        includeClassesRegexs.add(includeClassesRegex);
+        return includeClassesRegex;
+    }
+
+    public ExcludeClasses createExcludeClasses() {
+        ExcludeClasses excludeClassesRegex = new ExcludeClasses();
+        excludeClassesRegexs.add(excludeClassesRegex);
+        return excludeClassesRegex;
+    }
+
+    public Path createInstrumentationClasspath() {
+        if (instrumentationClasspath == null) {
+            instrumentationClasspath = new Path(getProject());
+        }
+        return instrumentationClasspath.createPath();
+    }
 
 	/*
-	 * TODO: Is the following method needed to use a classpath ref?  If so,
+     * TODO: Is the following method needed to use a classpath ref?  If so,
 	 *       test it and uncomment it.
 	 */
 	/*
@@ -162,144 +154,132 @@ public class InstrumentTask extends CommonMatchingTask
 	}
 	*/
 
-	public void execute() throws BuildException
-	{
-		CommandLineBuilder builder = null;
-		try {
-			builder = new CommandLineBuilder();
-			if (dataFile != null)
-				builder.addArg("--datafile", dataFile);
-			if (toDir != null)
-				builder.addArg("--destination", toDir.getAbsolutePath());
+    public void execute() throws BuildException {
+        CommandLineBuilder builder = null;
+        try {
+            builder = new CommandLineBuilder();
+            if (dataFile != null)
+                builder.addArg("--datafile", dataFile);
+            if (toDir != null)
+                builder.addArg("--destination", toDir.getAbsolutePath());
 
-			for (int i = 0; i < ignoreRegexs.size(); i++) {
-				Ignore ignoreRegex = (Ignore)ignoreRegexs.get(i);
-				builder.addArg("--ignore", ignoreRegex.getRegex());
-			}
+            for (int i = 0; i < ignoreRegexs.size(); i++) {
+                Ignore ignoreRegex = (Ignore) ignoreRegexs.get(i);
+                builder.addArg("--ignore", ignoreRegex.getRegex());
+            }
 
-			for (int i = 0; i < ignoreBranchesRegexs.size(); i++) {
-				IgnoreBranches ignoreBranchesRegex = (IgnoreBranches)ignoreBranchesRegexs.get(i);
-				builder.addArg("--ignoreBranches", ignoreBranchesRegex.getRegex());
-			}
+            for (int i = 0; i < ignoreBranchesRegexs.size(); i++) {
+                IgnoreBranches ignoreBranchesRegex = (IgnoreBranches) ignoreBranchesRegexs.get(i);
+                builder.addArg("--ignoreBranches", ignoreBranchesRegex.getRegex());
+            }
 
-			for (int i = 0; i < ignoreMethodAnnotations.size(); i++) {
-				IgnoreMethodAnnotation ignoreMethodAnn = (IgnoreMethodAnnotation)ignoreMethodAnnotations.get(i);
-				builder.addArg("--ignoreMethodAnnotation", ignoreMethodAnn.getAnnotationName());
-			}
-			
-			for (int i = 0; i < includeClassesRegexs.size(); i++) {
-				IncludeClasses includeClassesRegex = (IncludeClasses)includeClassesRegexs.get(i);
-				builder.addArg("--includeClasses", includeClassesRegex.getRegex());
-			}
+            for (int i = 0; i < ignoreMethodAnnotations.size(); i++) {
+                IgnoreMethodAnnotation ignoreMethodAnn = (IgnoreMethodAnnotation) ignoreMethodAnnotations.get(i);
+                builder.addArg("--ignoreMethodAnnotation", ignoreMethodAnn.getAnnotationName());
+            }
 
-			for (int i = 0; i < excludeClassesRegexs.size(); i++) {
-				ExcludeClasses excludeClassesRegex = (ExcludeClasses)excludeClassesRegexs.get(i);
-				builder.addArg("--excludeClasses", excludeClassesRegex.getRegex());
-			}
+            for (int i = 0; i < includeClassesRegexs.size(); i++) {
+                IncludeClasses includeClassesRegex = (IncludeClasses) includeClassesRegexs.get(i);
+                builder.addArg("--includeClasses", includeClassesRegex.getRegex());
+            }
 
-			if (ignoreTrivial)
-				builder.addArg("--ignoreTrivial");
-			
-			if (failOnError)
-				builder.addArg("--failOnError");
+            for (int i = 0; i < excludeClassesRegexs.size(); i++) {
+                ExcludeClasses excludeClassesRegex = (ExcludeClasses) excludeClassesRegexs.get(i);
+                builder.addArg("--excludeClasses", excludeClassesRegex.getRegex());
+            }
 
-			if (instrumentationClasspath != null) {
-				processInstrumentationClasspath();
-			}
-			createArgumentsForFilesets(builder);
+            if (ignoreTrivial)
+                builder.addArg("--ignoreTrivial");
 
-			builder.saveArgs();
-		} catch (IOException ioe) {
-			getProject().log("Error creating commands file.", Project.MSG_ERR);
-			throw new BuildException("Unable to create the commands file.", ioe);
-		}
+            if (failOnError)
+                builder.addArg("--failOnError");
 
-		// Execute GPL licensed code in separate virtual machine
-		getJava().createArg().setValue("--commandsfile");
-		getJava().createArg().setValue(builder.getCommandLineFile());
-		if (forkedJVMDebugPort != null && forkedJVMDebugPort.intValue() > 0) {
-			getJava().createJvmarg().setValue("-Xdebug");
-			getJava().createJvmarg().setValue("-Xrunjdwp:transport=dt_socket,address=" + forkedJVMDebugPort + ",server=y,suspend=y");
-		}
-		AntUtil.transferCoberturaDataFileProperty(getJava());
-		if (getJava().executeJava() != 0) {
-			throw new BuildException(
-					"Error instrumenting classes. See messages above.");
-		}
+            if (instrumentationClasspath != null) {
+                processInstrumentationClasspath();
+            }
+            createArgumentsForFilesets(builder);
 
-		builder.dispose();
-	}
+            builder.saveArgs();
+        } catch (IOException ioe) {
+            getProject().log("Error creating commands file.", Project.MSG_ERR);
+            throw new BuildException("Unable to create the commands file.", ioe);
+        }
 
-	private void processInstrumentationClasspath()
-	{
-		if (includeClassesRegexs.size() == 0)
-		{
-			throw new BuildException("'includeClasses' is required when 'instrumentationClasspath' is used");
-		}
+        // Execute GPL licensed code in separate virtual machine
+        getJava().createArg().setValue("--commandsfile");
+        getJava().createArg().setValue(builder.getCommandLineFile());
+        if (forkedJVMDebugPort != null && forkedJVMDebugPort.intValue() > 0) {
+            getJava().createJvmarg().setValue("-Xdebug");
+            getJava().createJvmarg().setValue("-Xrunjdwp:transport=dt_socket,address=" + forkedJVMDebugPort + ",server=y,suspend=y");
+        }
+        AntUtil.transferCoberturaDataFileProperty(getJava());
+        if (getJava().executeJava() != 0) {
+            throw new BuildException(
+                    "Error instrumenting classes. See messages above.");
+        }
 
-		String[] sources = instrumentationClasspath.list();
-		for (int i = 0; i < sources.length; i++) {
-			File fileOrDir = new File(sources[i]);
-			if (fileOrDir.exists())
-			{
-				if (fileOrDir.isDirectory()) {
-					createFilesetForDirectory(fileOrDir);
-				} else {
-					addFileToFilesets(fileOrDir);
-				}
-			}
-		}
-	}
+        builder.dispose();
+    }
 
-	private void addFileToFilesets(File file)
-	{
-		File dir = file.getParentFile();
-		String filename = file.getName();
-		FileSet fileSet = getFileSet(dir);
-		fileSet.createInclude().setName(filename);
-	}
+    private void processInstrumentationClasspath() {
+        if (includeClassesRegexs.size() == 0) {
+            throw new BuildException("'includeClasses' is required when 'instrumentationClasspath' is used");
+        }
 
-	private FileSet getFileSet(File dir)
-	{
-		String key = dir.getAbsolutePath();
-		FileSet fileSet = (FileSet)fileSetMap.get(key);
-		if (fileSet == null)
-		{
-	        fileSet = new FileSet();
-	        fileSet.setProject(getProject());
-	        fileSet.setDir(dir);
+        String[] sources = instrumentationClasspath.list();
+        for (int i = 0; i < sources.length; i++) {
+            File fileOrDir = new File(sources[i]);
+            if (fileOrDir.exists()) {
+                if (fileOrDir.isDirectory()) {
+                    createFilesetForDirectory(fileOrDir);
+                } else {
+                    addFileToFilesets(fileOrDir);
+                }
+            }
+        }
+    }
 
-	        // Now add the new fileset to the map and to the fileSets list 
-	        fileSetMap.put(key, fileSet);
-	        addFileset(fileSet);
-		}
-		return fileSet;
-	}
+    private void addFileToFilesets(File file) {
+        File dir = file.getParentFile();
+        String filename = file.getName();
+        FileSet fileSet = getFileSet(dir);
+        fileSet.createInclude().setName(filename);
+    }
 
-	private void createFilesetForDirectory(File dir)
-	{
-		FileSet fileSet = getFileSet(dir);
-		fileSet.createInclude().setName("**/*.class");
-	}
+    private FileSet getFileSet(File dir) {
+        String key = dir.getAbsolutePath();
+        FileSet fileSet = (FileSet) fileSetMap.get(key);
+        if (fileSet == null) {
+            fileSet = new FileSet();
+            fileSet.setProject(getProject());
+            fileSet.setDir(dir);
 
-	public void setDataFile(String dataFile)
-	{
-		this.dataFile = dataFile;
-	}
+            // Now add the new fileset to the map and to the fileSets list
+            fileSetMap.put(key, fileSet);
+            addFileset(fileSet);
+        }
+        return fileSet;
+    }
 
-	public void setToDir(File toDir)
-	{
-		this.toDir = toDir;
-	}
+    private void createFilesetForDirectory(File dir) {
+        FileSet fileSet = getFileSet(dir);
+        fileSet.createInclude().setName("**/*.class");
+    }
 
-	public void setIgnoreTrivial(boolean ignoreTrivial)
-	{
-		this.ignoreTrivial = ignoreTrivial;
-	}
-	
-	public void setForkedJVMDebugPort(Integer forkedJVMDebugPort)
-	{
-		this.forkedJVMDebugPort = forkedJVMDebugPort;
-	}
+    public void setDataFile(String dataFile) {
+        this.dataFile = dataFile;
+    }
+
+    public void setToDir(File toDir) {
+        this.toDir = toDir;
+    }
+
+    public void setIgnoreTrivial(boolean ignoreTrivial) {
+        this.ignoreTrivial = ignoreTrivial;
+    }
+
+    public void setForkedJVMDebugPort(Integer forkedJVMDebugPort) {
+        this.forkedJVMDebugPort = forkedJVMDebugPort;
+    }
 
 }

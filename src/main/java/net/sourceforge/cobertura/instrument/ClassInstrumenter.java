@@ -36,129 +36,117 @@ import org.objectweb.asm.Opcodes;
 
 import static org.objectweb.asm.Opcodes.ASM4;
 
-class ClassInstrumenter extends ClassVisitor
-{
+class ClassInstrumenter extends ClassVisitor {
 
-	private static final Logger logger = Logger
-			.getLogger(ClassInstrumenter.class);
+    private static final Logger logger = Logger
+            .getLogger(ClassInstrumenter.class);
 
-	private final static String hasBeenInstrumented = "net/sourceforge/cobertura/coveragedata/HasBeenInstrumented";
+    private final static String hasBeenInstrumented = "net/sourceforge/cobertura/coveragedata/HasBeenInstrumented";
 
-	private Collection ignoreRegexs;
+    private Collection ignoreRegexs;
 
-	private Collection ignoreBranchesRegexs;
+    private Collection ignoreBranchesRegexs;
 
-	private Collection ignoreMethodAnnotations;
-	 
-	private boolean ignoreTrivial;
+    private Collection ignoreMethodAnnotations;
 
-	private ProjectData projectData;
+    private boolean ignoreTrivial;
 
-	private ClassData classData;
+    private ProjectData projectData;
 
-	private String myName;
-	private String superName;
+    private ClassData classData;
 
-	private boolean instrument = false;
+    private String myName;
+    private String superName;
 
-	public String getClassName()
-	{
-		return this.myName;
-	}
+    private boolean instrument = false;
 
-	public boolean isInstrumented()
-	{
-		return instrument;
-	}
+    public String getClassName() {
+        return this.myName;
+    }
 
-	public ClassInstrumenter(ProjectData projectData, final ClassVisitor cv,
-			final Collection ignoreRegexs, final Collection ignoreBranchesRegexes,
-			final Collection ignoreMethodAnnotations, boolean ignoreTrivial) {
-		super(ASM4,cv);
-		this.projectData = projectData;
-		this.ignoreRegexs = ignoreRegexs;
-		this.ignoreBranchesRegexs = ignoreBranchesRegexs;
-		this.ignoreMethodAnnotations = ignoreMethodAnnotations;
-		this.ignoreTrivial = ignoreTrivial;
-	}
+    public boolean isInstrumented() {
+        return instrument;
+    }
 
-	private boolean arrayContains(Object[] array, Object key)
-	{
-		for (int i = 0; i < array.length; i++)
-		{
-			if (array[i].equals(key))
-				return true;
-		}
+    public ClassInstrumenter(ProjectData projectData, final ClassVisitor cv,
+                             final Collection ignoreRegexs, final Collection ignoreBranchesRegexes,
+                             final Collection ignoreMethodAnnotations, boolean ignoreTrivial) {
+        super(ASM4, cv);
+        this.projectData = projectData;
+        this.ignoreRegexs = ignoreRegexs;
+        this.ignoreBranchesRegexs = ignoreBranchesRegexs;
+        this.ignoreMethodAnnotations = ignoreMethodAnnotations;
+        this.ignoreTrivial = ignoreTrivial;
+    }
 
-		return false;
-	}
-
-	/**
-	 * @param name In the format
-	 *             "net/sourceforge/cobertura/coverage/ClassInstrumenter"
-	 */
-	public void visit(int version, int access, String name, String signature,
-			String superName, String[] interfaces)
-	{
-		this.myName = name.replace('/', '.');
-		this.classData = this.projectData.getOrCreateClassData(this.myName);
-		this.superName = superName;
-		this.classData.setContainsInstrumentationInfo();
-
-		// Do not attempt to instrument interfaces or classes that
-		// have already been instrumented
-		if (((access & Opcodes.ACC_INTERFACE) != 0)
-				|| arrayContains(interfaces, hasBeenInstrumented))
-		{
-			super.visit(version, access, name, signature, superName,
-							interfaces);
-		}
-		else
-		{
-			instrument = true;
-
-			// Flag this class as having been instrumented
-			String[] newInterfaces = new String[interfaces.length + 1];
-			System.arraycopy(interfaces, 0, newInterfaces, 0,
-							interfaces.length);
-			newInterfaces[newInterfaces.length - 1] = hasBeenInstrumented;
-
-			super.visit(version, access, name, signature, superName,
-					newInterfaces);
-		}
-	}
-
-	/**
-	 * @param source In the format "ClassInstrumenter.java"
-	 */
-	public void visitSource(String source, String debug)
-	{
-		super.visitSource(source, debug);
-		classData.setSourceFileName(source);
-	}
-
-	public MethodVisitor visitMethod(final int access, final String name,
-			final String desc, final String signature,
-			final String[] exceptions)
-	{
-		MethodVisitor mv = cv.visitMethod(access, name, desc, signature,
-				exceptions);
-
-		if (!instrument) {
-			return mv;
+    private boolean arrayContains(Object[] array, Object key) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i].equals(key))
+                return true;
         }
 
-		return mv == null ? null : new FirstPassMethodInstrumenter(classData, mv,
-				this.myName, this.superName, access, name, desc, signature, exceptions, 
-				ignoreRegexs, ignoreBranchesRegexs, ignoreMethodAnnotations, ignoreTrivial);
-	}
+        return false;
+    }
 
-	public void visitEnd()
-	{
-		if (instrument && classData.getNumberOfValidLines() == 0)
-			logger.warn("No line number information found for class "
-					+ this.myName
-					+ ".  Perhaps you need to compile with debug=true?");
-	}
+    /**
+     * @param name In the format
+     *             "net/sourceforge/cobertura/coverage/ClassInstrumenter"
+     */
+    public void visit(int version, int access, String name, String signature,
+                      String superName, String[] interfaces) {
+        this.myName = name.replace('/', '.');
+        this.classData = this.projectData.getOrCreateClassData(this.myName);
+        this.superName = superName;
+        this.classData.setContainsInstrumentationInfo();
+
+        // Do not attempt to instrument interfaces or classes that
+        // have already been instrumented
+        if (((access & Opcodes.ACC_INTERFACE) != 0)
+                || arrayContains(interfaces, hasBeenInstrumented)) {
+            super.visit(version, access, name, signature, superName,
+                    interfaces);
+        } else {
+            instrument = true;
+
+            // Flag this class as having been instrumented
+            String[] newInterfaces = new String[interfaces.length + 1];
+            System.arraycopy(interfaces, 0, newInterfaces, 0,
+                    interfaces.length);
+            newInterfaces[newInterfaces.length - 1] = hasBeenInstrumented;
+
+            super.visit(version, access, name, signature, superName,
+                    newInterfaces);
+        }
+    }
+
+    /**
+     * @param source In the format "ClassInstrumenter.java"
+     */
+    public void visitSource(String source, String debug) {
+        super.visitSource(source, debug);
+        classData.setSourceFileName(source);
+    }
+
+    public MethodVisitor visitMethod(final int access, final String name,
+                                     final String desc, final String signature,
+                                     final String[] exceptions) {
+        MethodVisitor mv = cv.visitMethod(access, name, desc, signature,
+                exceptions);
+
+        if (!instrument) {
+            return mv;
+        }
+
+        return mv == null ? null : new FirstPassMethodInstrumenter(classData, mv,
+                this.myName, this.superName, access, name, desc, signature, exceptions,
+                ignoreRegexs, ignoreBranchesRegexs, ignoreMethodAnnotations, ignoreTrivial);
+    }
+
+    public void visitEnd() {
+        if (instrument && classData.getNumberOfValidLines() == 0)
+            logger.warn("No line number information found for class "
+                    + this.myName
+                    + ".  Perhaps you need to compile with debug=true?");
+    }
 
 }

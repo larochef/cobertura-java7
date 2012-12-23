@@ -65,46 +65,43 @@ import net.sourceforge.cobertura.util.CommandLineBuilder;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
-public class MergeTask extends CommonMatchingTask
-{
+public class MergeTask extends CommonMatchingTask {
 
-	private String dataFile = null;
+    private String dataFile = null;
 
-	public MergeTask()
-	{
-		super("net.sourceforge.cobertura.merge.Main");
-	}
+    public MergeTask() {
+        super("net.sourceforge.cobertura.merge.Main");
+    }
 
-	public void execute() throws BuildException {
-		CommandLineBuilder builder = null;
-		try {
-			builder = new CommandLineBuilder();
-			if (dataFile != null)
-				builder.addArg("--datafile", dataFile);
+    public void execute() throws BuildException {
+        CommandLineBuilder builder = null;
+        try {
+            builder = new CommandLineBuilder();
+            if (dataFile != null)
+                builder.addArg("--datafile", dataFile);
 
-			createArgumentsForFilesets(builder);
+            createArgumentsForFilesets(builder);
 
-			builder.saveArgs();
-		} catch (IOException ioe) {
-			getProject().log("Error creating commands file.", Project.MSG_ERR);
-			throw new BuildException("Unable to create the commands file.", ioe);
-		}
+            builder.saveArgs();
+        } catch (IOException ioe) {
+            getProject().log("Error creating commands file.", Project.MSG_ERR);
+            throw new BuildException("Unable to create the commands file.", ioe);
+        }
 
-		// Execute GPL licensed code in separate virtual machine
-		getJava().createArg().setValue("--commandsfile");
-		getJava().createArg().setValue(builder.getCommandLineFile());
-		AntUtil.transferCoberturaDataFileProperty(getJava());
-		if (getJava().executeJava() != 0) {
-			throw new BuildException(
-					"Error running reports. See messages above.");
-		}
+        // Execute GPL licensed code in separate virtual machine
+        getJava().createArg().setValue("--commandsfile");
+        getJava().createArg().setValue(builder.getCommandLineFile());
+        AntUtil.transferCoberturaDataFileProperty(getJava());
+        if (getJava().executeJava() != 0) {
+            throw new BuildException(
+                    "Error running reports. See messages above.");
+        }
 
-		builder.dispose();
-	}
+        builder.dispose();
+    }
 
-	public void setDataFile(String dataFile)
-	{
-		this.dataFile = dataFile;
-	}
+    public void setDataFile(String dataFile) {
+        this.dataFile = dataFile;
+    }
 
 }

@@ -22,25 +22,21 @@
 
 package net.sourceforge.cobertura.check;
 
-public class CoverageRate
-{
+public class CoverageRate {
 
-	private final double lineCoverageRate;
-	private final double branchCoverageRate;
+    private final double lineCoverageRate;
+    private final double branchCoverageRate;
 
-	public CoverageRate(double lineCoverageRate, double branchCoverageRate)
-	{
-		this.lineCoverageRate = lineCoverageRate;
-		this.branchCoverageRate = branchCoverageRate;
-	}
+    public CoverageRate(double lineCoverageRate, double branchCoverageRate) {
+        this.lineCoverageRate = lineCoverageRate;
+        this.branchCoverageRate = branchCoverageRate;
+    }
 
-	public double getLineCoverageRate()
-	{
-		return lineCoverageRate;
-	}
+    public double getLineCoverageRate() {
+        return lineCoverageRate;
+    }
 
-	public double getBranchCoverageRate()
-	{
-		return branchCoverageRate;
-	}
+    public double getBranchCoverageRate() {
+        return branchCoverageRate;
+    }
 }

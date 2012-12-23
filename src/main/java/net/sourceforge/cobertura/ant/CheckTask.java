@@ -69,155 +69,132 @@ import org.apache.tools.ant.BuildException;
  * the coverage percentage for lines or branches is below a certain,
  * user specifiable threshold.
  */
-public class CheckTask extends CommonMatchingTask
-{
+public class CheckTask extends CommonMatchingTask {
 
-	private String dataFile = null;
+    private String dataFile = null;
 
-	final Set regexes = new HashSet();
+    final Set regexes = new HashSet();
 
-	private String branchRate = null;
+    private String branchRate = null;
 
-	private String lineRate = null;
+    private String lineRate = null;
 
-	private String packageBranchRate = null;
+    private String packageBranchRate = null;
 
-	private String packageLineRate = null;
+    private String packageLineRate = null;
 
-	private String totalBranchRate = null;
+    private String totalBranchRate = null;
 
-	private String totalLineRate = null;
+    private String totalLineRate = null;
 
-	private String failureProperty = null;
+    private String failureProperty = null;
 
-	private boolean haltOnFailure = true;
+    private boolean haltOnFailure = true;
 
-	public CheckTask() {
-		super("net.sourceforge.cobertura.check.Main");
-	}
-	
-	public void execute() throws BuildException
-	{
-		if (dataFile != null)
-		{
-			getJava().createArg().setValue("--datafile");
-			getJava().createArg().setValue(dataFile);
-		}
+    public CheckTask() {
+        super("net.sourceforge.cobertura.check.Main");
+    }
 
-		if (branchRate != null)
-		{
-			getJava().createArg().setValue("--branch");
-			getJava().createArg().setValue(branchRate);
-		}
+    public void execute() throws BuildException {
+        if (dataFile != null) {
+            getJava().createArg().setValue("--datafile");
+            getJava().createArg().setValue(dataFile);
+        }
 
-		if (lineRate != null)
-		{
-			getJava().createArg().setValue("--line");
-			getJava().createArg().setValue(lineRate);
-		}
+        if (branchRate != null) {
+            getJava().createArg().setValue("--branch");
+            getJava().createArg().setValue(branchRate);
+        }
 
-		if (packageBranchRate != null)
-		{
-			getJava().createArg().setValue("--packagebranch");
-			getJava().createArg().setValue(packageBranchRate);
-		}
+        if (lineRate != null) {
+            getJava().createArg().setValue("--line");
+            getJava().createArg().setValue(lineRate);
+        }
 
-		if (packageLineRate != null)
-		{
-			getJava().createArg().setValue("--packageline");
-			getJava().createArg().setValue(packageLineRate);
-		}
+        if (packageBranchRate != null) {
+            getJava().createArg().setValue("--packagebranch");
+            getJava().createArg().setValue(packageBranchRate);
+        }
 
-		if (totalBranchRate != null)
-		{
-			getJava().createArg().setValue("--totalbranch");
-			getJava().createArg().setValue(totalBranchRate);
-		}
+        if (packageLineRate != null) {
+            getJava().createArg().setValue("--packageline");
+            getJava().createArg().setValue(packageLineRate);
+        }
 
-		if (totalLineRate != null)
-		{
-			getJava().createArg().setValue("--totalline");
-			getJava().createArg().setValue(totalLineRate);
-		}
+        if (totalBranchRate != null) {
+            getJava().createArg().setValue("--totalbranch");
+            getJava().createArg().setValue(totalBranchRate);
+        }
 
-		Iterator iter = regexes.iterator();
-		while (iter.hasNext())
-		{
-			getJava().createArg().setValue("--regex");
-			getJava().createArg().setValue(iter.next().toString());
-		}
+        if (totalLineRate != null) {
+            getJava().createArg().setValue("--totalline");
+            getJava().createArg().setValue(totalLineRate);
+        }
 
-		AntUtil.transferCoberturaDataFileProperty(getJava());
-		int returnCode = getJava().executeJava();
+        Iterator iter = regexes.iterator();
+        while (iter.hasNext()) {
+            getJava().createArg().setValue("--regex");
+            getJava().createArg().setValue(iter.next().toString());
+        }
 
-		// Check the return code and print a message
-		if (returnCode == 0)
-		{
-			System.out.println("All checks passed.");
-		}
-		else
-		{
-			if (haltOnFailure)
-				throw new BuildException(
-						"Coverage check failed. See messages above.");
-			else if (failureProperty != null)
-				getProject().setProperty(failureProperty, "true");
-			else
-				System.err
-						.println("Coverage check failed. See messages above.");
-		}
-	}
+        AntUtil.transferCoberturaDataFileProperty(getJava());
+        int returnCode = getJava().executeJava();
 
-	public Regex createRegex()
-	{
-		Regex regex = new Regex();
-		regexes.add(regex);
-		return regex;
-	}
+        // Check the return code and print a message
+        if (returnCode == 0) {
+            System.out.println("All checks passed.");
+        } else {
+            if (haltOnFailure)
+                throw new BuildException(
+                        "Coverage check failed. See messages above.");
+            else if (failureProperty != null)
+                getProject().setProperty(failureProperty, "true");
+            else
+                System.err
+                        .println("Coverage check failed. See messages above.");
+        }
+    }
 
-	public void setDataFile(String dataFile)
-	{
-		this.dataFile = dataFile;
-	}
+    public Regex createRegex() {
+        Regex regex = new Regex();
+        regexes.add(regex);
+        return regex;
+    }
 
-	public void setBranchRate(String branchRate)
-	{
-		this.branchRate = branchRate;
-	}
+    public void setDataFile(String dataFile) {
+        this.dataFile = dataFile;
+    }
 
-	public void setLineRate(String lineRate)
-	{
-		this.lineRate = lineRate;
-	}
+    public void setBranchRate(String branchRate) {
+        this.branchRate = branchRate;
+    }
 
-	public void setPackageBranchRate(String packageBranchRate)
-	{
-		this.packageBranchRate = packageBranchRate;
-	}
+    public void setLineRate(String lineRate) {
+        this.lineRate = lineRate;
+    }
 
-	public void setPackageLineRate(String packageLineRate)
-	{
-		this.packageLineRate = packageLineRate;
-	}
+    public void setPackageBranchRate(String packageBranchRate) {
+        this.packageBranchRate = packageBranchRate;
+    }
 
-	public void setTotalBranchRate(String totalBranchRate)
-	{
-		this.totalBranchRate = totalBranchRate;
-	}
+    public void setPackageLineRate(String packageLineRate) {
+        this.packageLineRate = packageLineRate;
+    }
 
-	public void setTotalLineRate(String totalLineRate)
-	{
-		this.totalLineRate = totalLineRate;
-	}
+    public void setTotalBranchRate(String totalBranchRate) {
+        this.totalBranchRate = totalBranchRate;
+    }
 
-	public void setFailureProperty(String failureProperty)
-	{
-		this.failureProperty = failureProperty;
-	}
+    public void setTotalLineRate(String totalLineRate) {
+        this.totalLineRate = totalLineRate;
+    }
 
-	public void setHaltOnFailure(boolean haltOnFailure)
-	{
-		this.haltOnFailure = haltOnFailure;
-	}
+    public void setFailureProperty(String failureProperty) {
+        this.failureProperty = failureProperty;
+    }
+
+    public void setHaltOnFailure(boolean haltOnFailure) {
+        this.haltOnFailure = haltOnFailure;
+    }
 
 }

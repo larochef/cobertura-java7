@@ -201,7 +201,7 @@ public class SourceFileData extends CoverageDataContainer<ClassData>
     public boolean isValidSourceLineNumber(int lineNumber) {
         lock.lock();
         try {
-            for(ClassData classData : this.children.values()) {
+            for (ClassData classData : this.children.values()) {
                 if (classData.isValidSourceLineNumber(lineNumber)) {
                     return true;
                 }

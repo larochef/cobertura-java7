@@ -35,64 +35,58 @@ import net.sourceforge.cobertura.coveragedata.ProjectData;
 import net.sourceforge.cobertura.util.CommandLineBuilder;
 import net.sourceforge.cobertura.util.Header;
 
-public class Main
-{
+public class Main {
 
-	public Main(String[] args)
-	{
-		File dataFile = CoverageDataFileHandler.getDefaultDataFile();
-		File baseDir = null;
-		List filesToMerge = new ArrayList();
+    public Main(String[] args) {
+        File dataFile = CoverageDataFileHandler.getDefaultDataFile();
+        File baseDir = null;
+        List filesToMerge = new ArrayList();
 
-		// Go through all the parameters
-		for (int i = 0; i < args.length; i++)
-		{
-			if (args[i].equals("--datafile"))
-				dataFile = new File(args[++i]);
-			else if (args[i].equals("--basedir"))
-				baseDir = new File(args[++i]);
-			else
-				filesToMerge.add( new File(baseDir, args[i]));
-		}
+        // Go through all the parameters
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("--datafile"))
+                dataFile = new File(args[++i]);
+            else if (args[i].equals("--basedir"))
+                baseDir = new File(args[++i]);
+            else
+                filesToMerge.add(new File(baseDir, args[i]));
+        }
 
-		// Load coverage data
-		ProjectData projectData = null;
-		if (dataFile.isFile())
-			projectData = CoverageDataFileHandler.loadCoverageData(dataFile);
-		if (projectData == null)
-			projectData = new ProjectData();
+        // Load coverage data
+        ProjectData projectData = null;
+        if (dataFile.isFile())
+            projectData = CoverageDataFileHandler.loadCoverageData(dataFile);
+        if (projectData == null)
+            projectData = new ProjectData();
 
-		if (filesToMerge.isEmpty())
-		{
-			System.err.println("Error: No files were specified for merging.");
-			System.exit(1);
-		}
+        if (filesToMerge.isEmpty()) {
+            System.err.println("Error: No files were specified for merging.");
+            System.exit(1);
+        }
 
-		// Merge everything
-		Iterator iter = filesToMerge.iterator();
-		while (iter.hasNext())
-		{
-			File newDataFile = (File)iter.next();
-			ProjectData projectDataNew = CoverageDataFileHandler
-					.loadCoverageData(newDataFile);
-			if (projectDataNew != null)
-				projectData.merge(projectDataNew);
-		}
+        // Merge everything
+        Iterator iter = filesToMerge.iterator();
+        while (iter.hasNext()) {
+            File newDataFile = (File) iter.next();
+            ProjectData projectDataNew = CoverageDataFileHandler
+                    .loadCoverageData(newDataFile);
+            if (projectDataNew != null)
+                projectData.merge(projectDataNew);
+        }
 
-		// Save the combined data file
-		CoverageDataFileHandler.saveCoverageData(projectData, dataFile);
-	}
+        // Save the combined data file
+        CoverageDataFileHandler.saveCoverageData(projectData, dataFile);
+    }
 
-	public static void main(String[] args)
-	{
-		Header.print(System.out);
+    public static void main(String[] args) {
+        Header.print(System.out);
 
-		try {
-			args = CommandLineBuilder.preprocessCommandLineArguments( args);
-		} catch( Exception ex) {
-			System.err.println( "Error: Cannot process arguments: " + ex.getMessage());
-			System.exit(1);
-		}
-		new Main(args);
-	}
+        try {
+            args = CommandLineBuilder.preprocessCommandLineArguments(args);
+        } catch (Exception ex) {
+            System.err.println("Error: Cannot process arguments: " + ex.getMessage());
+            System.exit(1);
+        }
+        new Main(args);
+    }
 }

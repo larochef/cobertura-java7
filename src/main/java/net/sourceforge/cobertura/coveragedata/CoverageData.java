@@ -23,25 +23,25 @@ package net.sourceforge.cobertura.coveragedata;
 
 public interface CoverageData {
 
-	double getBranchCoverageRate();
+    double getBranchCoverageRate();
 
-	double getLineCoverageRate();
+    double getLineCoverageRate();
 
-	int getNumberOfCoveredBranches();
+    int getNumberOfCoveredBranches();
 
-	int getNumberOfCoveredLines();
+    int getNumberOfCoveredLines();
 
-	int getNumberOfValidBranches();
+    int getNumberOfValidBranches();
 
-	int getNumberOfValidLines();
+    int getNumberOfValidLines();
 
-	/**
-	 * Warning: This is generally implemented as a
-	 * "shallow" merge.  For our current use, this
-	 * should be fine, but in the future it may make
-	 * sense to modify the merge methods of the
-	 * various classes to do a deep copy of the
-	 * appropriate objects.
-	 */
-	void merge(CoverageData coverageData);
+    /**
+     * Warning: This is generally implemented as a
+     * "shallow" merge.  For our current use, this
+     * should be fine, but in the future it may make
+     * sense to modify the merge methods of the
+     * various classes to do a deep copy of the
+     * appropriate objects.
+     */
+    void merge(CoverageData coverageData);
 }

@@ -51,14 +51,14 @@ public interface JavaParserInterface {
     /*public int getTopLevelClasses() {
       return _topLevelClasses;
       }*/
-    
+
     public List<FunctionMetric> getFunction();
-    
+
     /**
      * @return The empty package consists of the name ".".
      */
     public Map<String, PackageMetric> getPackage();
-    
+
     public List getImports();
 
     /**

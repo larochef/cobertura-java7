@@ -67,73 +67,72 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
 /**
- * Generate a coverage report based on coverage data generated 
+ * Generate a coverage report based on coverage data generated
  * by instrumented classes.
  */
-public class ReportTask extends CommonMatchingTask
-{
+public class ReportTask extends CommonMatchingTask {
 
-	private String dataFile = null;
-	private String format = "html";
-	private File destDir;
-	private String srcDir;
-   private String encoding;
+    private String dataFile = null;
+    private String format = "html";
+    private File destDir;
+    private String srcDir;
+    private String encoding;
 
-	public ReportTask() {
-		super("net.sourceforge.cobertura.reporting.Main");
-	}
-	
-	public void execute() throws BuildException {
-		CommandLineBuilder builder = null;
-		try {
-			builder = new CommandLineBuilder();
-			if (dataFile != null)
-				builder.addArg("--datafile", dataFile);
-			if (destDir != null)
-				builder.addArg("--destination", destDir.getAbsolutePath());
-			if (format != null)
-				builder.addArg("--format", format);
-         if (encoding != null)
-            builder.addArg("--encoding", encoding);
-			if (srcDir != null)
-				builder.addArg(srcDir);
-			createArgumentsForFilesets(builder);
+    public ReportTask() {
+        super("net.sourceforge.cobertura.reporting.Main");
+    }
 
-			builder.saveArgs();
-		} catch (IOException ioe) {
-			getProject().log("Error creating commands file.", Project.MSG_ERR);
-			throw new BuildException("Unable to create the commands file.", ioe);
-		}
+    public void execute() throws BuildException {
+        CommandLineBuilder builder = null;
+        try {
+            builder = new CommandLineBuilder();
+            if (dataFile != null)
+                builder.addArg("--datafile", dataFile);
+            if (destDir != null)
+                builder.addArg("--destination", destDir.getAbsolutePath());
+            if (format != null)
+                builder.addArg("--format", format);
+            if (encoding != null)
+                builder.addArg("--encoding", encoding);
+            if (srcDir != null)
+                builder.addArg(srcDir);
+            createArgumentsForFilesets(builder);
 
-		// Execute GPL licensed code in separate virtual machine
-		getJava().createArg().setValue("--commandsfile");
-		getJava().createArg().setValue(builder.getCommandLineFile());
-		AntUtil.transferCoberturaDataFileProperty(getJava());
-		if (getJava().executeJava() != 0) {
-			throw new BuildException(
-					"Error running reports. See messages above.");
-		}
+            builder.saveArgs();
+        } catch (IOException ioe) {
+            getProject().log("Error creating commands file.", Project.MSG_ERR);
+            throw new BuildException("Unable to create the commands file.", ioe);
+        }
 
-		builder.dispose();
-	}
+        // Execute GPL licensed code in separate virtual machine
+        getJava().createArg().setValue("--commandsfile");
+        getJava().createArg().setValue(builder.getCommandLineFile());
+        AntUtil.transferCoberturaDataFileProperty(getJava());
+        if (getJava().executeJava() != 0) {
+            throw new BuildException(
+                    "Error running reports. See messages above.");
+        }
 
-	public void setDataFile(String dataFile) {
-		this.dataFile = dataFile;
-	}
+        builder.dispose();
+    }
 
-	public void setDestDir(File destDir) {
-		this.destDir = destDir;
-	}
+    public void setDataFile(String dataFile) {
+        this.dataFile = dataFile;
+    }
 
-	public void setFormat(String format) {
-		this.format = format;
-	}
+    public void setDestDir(File destDir) {
+        this.destDir = destDir;
+    }
 
-   public void setEncoding(String encoding) {
-      this.encoding = encoding;
-   }
-	
-	public void setSrcDir(String dir) {
-		srcDir = dir;
-	}
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
+    public void setSrcDir(String dir) {
+        srcDir = dir;
+    }
 }
