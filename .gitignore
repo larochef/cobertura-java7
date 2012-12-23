@@ -1,0 +1,6 @@
+*.iml
+.project
+.classpath
+.settings
+.idea
+cobertura.ser
