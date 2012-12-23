@@ -151,12 +151,12 @@ public class JavaParser15 implements JavaParserInterface {
         if (jj_2_1(2147483647)) {
             PackageDeclaration();
         }
-        while (((jj_ntk == -1) ? jj_ntk() : jj_ntk) == IMPORT) {
+        while (currentTokenType() == IMPORT) {
             ImportDeclaration();
         }
         boolean stop = false;
         while (!stop) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case ABSTRACT:
                 case CLASS:
                 case ENUM:
@@ -179,13 +179,13 @@ public class JavaParser15 implements JavaParserInterface {
             }
             TypeDeclaration();
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case 127:
                 jj_consume_token(127);
                 break;
             default:
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case STUFF_TO_IGNORE:
                 jj_consume_token(STUFF_TO_IGNORE);
                 break;
@@ -203,14 +203,14 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ImportDeclaration() throws ParseException {
         jj_consume_token(IMPORT);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case STATIC:
                 jj_consume_token(STATIC);
                 break;
             default:
         }
         Name();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case DOT:
                 jj_consume_token(DOT);
                 jj_consume_token(STAR);
@@ -228,7 +228,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public int Modifiers() throws ParseException {
         int modifiers = 0;
         while (!jj_2_2(2)) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case PUBLIC:
                     jj_consume_token(PUBLIC);
                     modifiers |= ModifierSet.PUBLIC;
@@ -288,7 +288,7 @@ public class JavaParser15 implements JavaParserInterface {
  * Declaration syntax follows.
  */
     final public void TypeDeclaration() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case SEMICOLON:
                 jj_consume_token(SEMICOLON);
                 break;
@@ -307,7 +307,7 @@ public class JavaParser15 implements JavaParserInterface {
             case TRANSIENT:
             case VOLATILE:
             case AT:
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                switch (currentTokenType()) {
                     case CLASS:
                     case INTERFACE:
                         ClassOrInterfaceDeclaration();
@@ -331,7 +331,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ClassOrInterfaceDeclaration() throws ParseException {
         boolean isInterface = false;
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case CLASS:
                 jj_consume_token(CLASS);
                 break;
@@ -344,19 +344,19 @@ public class JavaParser15 implements JavaParserInterface {
                 throw new ParseException();
         }
         jj_consume_token(IDENTIFIER);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case LT:
                 TypeParameters();
                 break;
             default:
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case EXTENDS:
                 ExtendsList(isInterface);
                 break;
             default:
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case IMPLEMENTS:
                 ImplementsList(isInterface);
                 break;
@@ -371,7 +371,7 @@ public class JavaParser15 implements JavaParserInterface {
         ClassOrInterfaceType();
         label_6:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case COMMA:
                     break;
                 default:
@@ -391,7 +391,7 @@ public class JavaParser15 implements JavaParserInterface {
         ClassOrInterfaceType();
         label_7:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case COMMA:
                     break;
                 default:
@@ -408,7 +408,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void EnumDeclaration() throws ParseException {
         jj_consume_token(ENUM);
         jj_consume_token(IDENTIFIER);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case IMPLEMENTS:
                 ImplementsList(false);
                 break;
@@ -419,7 +419,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void EnumBody() throws ParseException {
         jj_consume_token(LBRACE);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case ABSTRACT:
             case FINAL:
             case NATIVE:
@@ -441,18 +441,18 @@ public class JavaParser15 implements JavaParserInterface {
                 break;
             default:
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case COMMA:
                 jj_consume_token(COMMA);
                 break;
             default:
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case SEMICOLON:
                 jj_consume_token(SEMICOLON);
                 label_9:
                 while (true) {
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case ABSTRACT:
                         case BOOLEAN:
                         case BYTE:
@@ -496,13 +496,13 @@ public class JavaParser15 implements JavaParserInterface {
     final public void EnumConstant() throws ParseException {
         Modifiers();
         jj_consume_token(IDENTIFIER);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case LPAREN:
                 Arguments();
                 break;
             default:
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case LBRACE:
                 ClassOrInterfaceBody(false);
                 break;
@@ -513,9 +513,9 @@ public class JavaParser15 implements JavaParserInterface {
     final public void TypeParameters() throws ParseException {
         jj_consume_token(LT);
         // Add support for diamond operator
-        if(((jj_ntk == -1) ? jj_ntk() : jj_ntk) != GT) {
+        if((currentTokenType()) != GT) {
             TypeParameter();
-            while (((jj_ntk == -1) ? jj_ntk() : jj_ntk) == COMMA) {
+            while ((currentTokenType()) == COMMA) {
                 jj_consume_token(COMMA);
                 TypeParameter();
             }
@@ -525,7 +525,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void TypeParameter() throws ParseException {
         jj_consume_token(IDENTIFIER);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case EXTENDS:
                 TypeBound();
                 break;
@@ -538,7 +538,7 @@ public class JavaParser15 implements JavaParserInterface {
         ClassOrInterfaceType();
         label_11:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case BIT_AND:
                     break;
                 default:
@@ -553,7 +553,7 @@ public class JavaParser15 implements JavaParserInterface {
         jj_consume_token(LBRACE);
         label_12:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case ABSTRACT:
                 case BOOLEAN:
                 case BYTE:
@@ -599,7 +599,7 @@ public class JavaParser15 implements JavaParserInterface {
                 throw new ParseException("An interface cannot have initializers");
             }
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case ABSTRACT:
                 case BOOLEAN:
                 case BYTE:
@@ -626,7 +626,7 @@ public class JavaParser15 implements JavaParserInterface {
                 case IDENTIFIER:
                 case AT:
                 case LT:
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case CLASS:
                         case INTERFACE:
                             ClassOrInterfaceDeclaration();
@@ -640,7 +640,7 @@ public class JavaParser15 implements JavaParserInterface {
                             } else if (jj_2_5(2147483647)) {
                                 FieldDeclaration();
                             } else {
-                                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                                switch (currentTokenType()) {
                                     case BOOLEAN:
                                     case BYTE:
                                     case CHAR:
@@ -676,7 +676,7 @@ public class JavaParser15 implements JavaParserInterface {
         VariableDeclarator();
         label_13:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case COMMA:
                     break;
                 default:
@@ -690,7 +690,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void VariableDeclarator() throws ParseException {
         VariableDeclaratorId();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case ASSIGN:
                 jj_consume_token(ASSIGN);
                 VariableInitializer();
@@ -703,7 +703,7 @@ public class JavaParser15 implements JavaParserInterface {
         jj_consume_token(IDENTIFIER);
         label_14:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case LBRACKET:
                     break;
                 default:
@@ -715,7 +715,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void VariableInitializer() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case LBRACE:
                 ArrayInitializer();
                 break;
@@ -756,7 +756,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ArrayInitializer() throws ParseException {
         jj_consume_token(LBRACE);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case BOOLEAN:
             case BYTE:
             case CHAR:
@@ -793,7 +793,7 @@ public class JavaParser15 implements JavaParserInterface {
                 break;
             default:
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case COMMA:
                 jj_consume_token(COMMA);
                 break;
@@ -803,7 +803,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void MethodDeclaration() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case LT:
                 TypeParameters();
                 break;
@@ -811,14 +811,14 @@ public class JavaParser15 implements JavaParserInterface {
         }
         ResultType();
         MethodDeclarator();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case THROWS:
                 jj_consume_token(THROWS);
                 NameList();
                 break;
             default:
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case LBRACE:
                 Block();
                 break;
@@ -836,7 +836,7 @@ public class JavaParser15 implements JavaParserInterface {
         FormalParameters();
         label_16:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case LBRACKET:
                     break;
                 default:
@@ -849,7 +849,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void FormalParameters() throws ParseException {
         jj_consume_token(LPAREN);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case ABSTRACT:
             case BOOLEAN:
             case BYTE:
@@ -874,7 +874,7 @@ public class JavaParser15 implements JavaParserInterface {
                 FormalParameter();
                 label_17:
                 while (true) {
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case COMMA:
                             break;
                         default:
@@ -892,7 +892,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void FormalParameter() throws ParseException {
         Modifiers();
         Type();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case ELLIPSIS:
                 jj_consume_token(ELLIPSIS);
                 break;
@@ -902,7 +902,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void ConstructorDeclaration() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case LT:
                 TypeParameters();
                 break;
@@ -910,7 +910,7 @@ public class JavaParser15 implements JavaParserInterface {
         }
         jj_consume_token(IDENTIFIER);
         FormalParameters();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case THROWS:
                 jj_consume_token(THROWS);
                 NameList();
@@ -923,7 +923,7 @@ public class JavaParser15 implements JavaParserInterface {
         }
         label_18:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case ABSTRACT:
                 case ASSERT:
                 case BOOLEAN:
@@ -986,7 +986,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void ExplicitConstructorInvocation() throws ParseException {
         label_19:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case IDENTIFIER:
                     break;
                 default:
@@ -999,13 +999,13 @@ public class JavaParser15 implements JavaParserInterface {
             jj_consume_token(THIS);
             jj_consume_token(DOT);
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case LT:
                 TypeArguments();
                 break;
             default:
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case THIS:
                 jj_consume_token(THIS);
                 break;
@@ -1021,7 +1021,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void Initializer() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case STATIC:
                 jj_consume_token(STATIC);
                 break;
@@ -1037,7 +1037,7 @@ public class JavaParser15 implements JavaParserInterface {
         if (jj_2_10(2)) {
             ReferenceType();
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case BOOLEAN:
                 case BYTE:
                 case CHAR:
@@ -1056,7 +1056,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void ReferenceType() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case BOOLEAN:
             case BYTE:
             case CHAR:
@@ -1104,7 +1104,7 @@ public class JavaParser15 implements JavaParserInterface {
         TypeArgument();
         label_23:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case COMMA:
                     break;
                 default:
@@ -1117,7 +1117,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void TypeArgument() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case BOOLEAN:
             case BYTE:
             case CHAR:
@@ -1131,7 +1131,7 @@ public class JavaParser15 implements JavaParserInterface {
                 break;
             case HOOK:
                 jj_consume_token(HOOK);
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                switch (currentTokenType()) {
                     case EXTENDS:
                     case SUPER:
                         WildcardBounds();
@@ -1146,7 +1146,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void WildcardBounds() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case EXTENDS:
                 jj_consume_token(EXTENDS);
                 ReferenceType();
@@ -1162,7 +1162,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void PrimitiveType() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case BOOLEAN:
                 jj_consume_token(BOOLEAN);
                 break;
@@ -1194,7 +1194,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void ResultType() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case VOID:
                 jj_consume_token(VOID);
                 break;
@@ -1227,7 +1227,7 @@ public class JavaParser15 implements JavaParserInterface {
         Name();
         label_25:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case COMMA:
                     break;
                 default:
@@ -1250,7 +1250,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void AssignmentOperator() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case ASSIGN:
                 jj_consume_token(ASSIGN);
                 break;
@@ -1295,7 +1295,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ConditionalExpression() throws ParseException {
         ConditionalOrExpression();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case HOOK:
                 jj_consume_token(HOOK);
                 Expression();
@@ -1310,7 +1310,7 @@ public class JavaParser15 implements JavaParserInterface {
         ConditionalAndExpression();
         label_26:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case SC_OR:
                     break;
                 default:
@@ -1325,7 +1325,7 @@ public class JavaParser15 implements JavaParserInterface {
         InclusiveOrExpression();
         label_27:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case SC_AND:
                     break;
                 default:
@@ -1340,7 +1340,7 @@ public class JavaParser15 implements JavaParserInterface {
         ExclusiveOrExpression();
         label_28:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case BIT_OR:
                     break;
                 default:
@@ -1355,7 +1355,7 @@ public class JavaParser15 implements JavaParserInterface {
         AndExpression();
         label_29:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case XOR:
                     break;
                 default:
@@ -1370,7 +1370,7 @@ public class JavaParser15 implements JavaParserInterface {
         EqualityExpression();
         label_30:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case BIT_AND:
                     break;
                 default:
@@ -1385,14 +1385,14 @@ public class JavaParser15 implements JavaParserInterface {
         InstanceOfExpression();
         label_31:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case EQ:
                 case NE:
                     break;
                 default:
                     break label_31;
             }
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case EQ:
                     jj_consume_token(EQ);
                     break;
@@ -1409,7 +1409,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void InstanceOfExpression() throws ParseException {
         RelationalExpression();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case INSTANCEOF:
                 jj_consume_token(INSTANCEOF);
                 Type();
@@ -1422,7 +1422,7 @@ public class JavaParser15 implements JavaParserInterface {
         ShiftExpression();
         label_32:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case LT:
                 case LE:
                 case GE:
@@ -1431,7 +1431,7 @@ public class JavaParser15 implements JavaParserInterface {
                 default:
                     break label_32;
             }
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case LT:
                     jj_consume_token(LT);
                     break;
@@ -1455,7 +1455,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void ShiftExpression() throws ParseException {
         AdditiveExpression();
         while (!jj_2_18(1)) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case LSHIFT:
                     jj_consume_token(LSHIFT);
                     break;
@@ -1477,14 +1477,14 @@ public class JavaParser15 implements JavaParserInterface {
         MultiplicativeExpression();
         label_34:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case PLUS:
                 case MINUS:
                     break;
                 default:
                     break label_34;
             }
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case PLUS:
                     jj_consume_token(PLUS);
                     break;
@@ -1503,7 +1503,7 @@ public class JavaParser15 implements JavaParserInterface {
         UnaryExpression();
         label_35:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case STAR:
                 case SLASH:
                 case REM:
@@ -1511,7 +1511,7 @@ public class JavaParser15 implements JavaParserInterface {
                 default:
                     break label_35;
             }
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case STAR:
                     jj_consume_token(STAR);
                     break;
@@ -1530,10 +1530,10 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void UnaryExpression() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case PLUS:
             case MINUS:
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                switch (currentTokenType()) {
                     case PLUS:
                         jj_consume_token(PLUS);
                         break;
@@ -1594,10 +1594,10 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void UnaryExpressionNotPlusMinus() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case BANG:
             case TILDE:
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                switch (currentTokenType()) {
                     case TILDE:
                         jj_consume_token(TILDE);
                         break;
@@ -1614,7 +1614,7 @@ public class JavaParser15 implements JavaParserInterface {
                 if (jj_2_21(2147483647)) {
                     CastExpression();
                 } else {
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case BOOLEAN:
                         case BYTE:
                         case CHAR:
@@ -1659,12 +1659,12 @@ public class JavaParser15 implements JavaParserInterface {
 //            jj_consume_token(LBRACKET);
 //            jj_consume_token(RBRACKET);
 //        } else {
-//            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+//            switch (currentTokenType()) {
 //                case LPAREN:
 //                    jj_consume_token(LPAREN);
 //                    Type();
 //                    jj_consume_token(RPAREN);
-//                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+//                    switch (currentTokenType()) {
 //                        case TILDE:
 //                            jj_consume_token(TILDE);
 //                            break;
@@ -1709,10 +1709,10 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void PostfixExpression() throws ParseException {
         PrimaryExpression();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case INCR:
             case DECR:
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                switch (currentTokenType()) {
                     case INCR:
                         jj_consume_token(INCR);
                         break;
@@ -1735,7 +1735,7 @@ public class JavaParser15 implements JavaParserInterface {
             jj_consume_token(RPAREN);
             UnaryExpression();
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case LPAREN:
                     jj_consume_token(LPAREN);
                     Type();
@@ -1763,7 +1763,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void PrimaryPrefix() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case FALSE:
             case NULL:
             case TRUE:
@@ -1777,7 +1777,7 @@ public class JavaParser15 implements JavaParserInterface {
                 if (jj_2_26(2147483647)) {
                     label_37:
                     while (true) {
-                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        switch (currentTokenType()) {
                             case IDENTIFIER:
                                 break;
                             default:
@@ -1788,7 +1788,7 @@ public class JavaParser15 implements JavaParserInterface {
                     }
                     jj_consume_token(THIS);
                 } else {
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case SUPER:
                             jj_consume_token(SUPER);
                             jj_consume_token(DOT);
@@ -1808,7 +1808,7 @@ public class JavaParser15 implements JavaParserInterface {
                                 jj_consume_token(DOT);
                                 jj_consume_token(CLASS);
                             } else {
-                                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                                switch (currentTokenType()) {
                                     case IDENTIFIER:
                                         Name();
                                         break;
@@ -1835,7 +1835,7 @@ public class JavaParser15 implements JavaParserInterface {
         } else if (jj_2_31(3)) {
             MemberSelector();
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case LBRACKET:
                     jj_consume_token(LBRACKET);
                     Expression();
@@ -1856,7 +1856,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void Literal() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case INTEGER_LITERAL:
                 jj_consume_token(INTEGER_LITERAL);
                 break;
@@ -1883,7 +1883,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void BooleanLiteral() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case TRUE:
                 jj_consume_token(TRUE);
                 break;
@@ -1902,7 +1902,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void Arguments() throws ParseException {
         jj_consume_token(LPAREN);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case BOOLEAN:
             case BYTE:
             case CHAR:
@@ -1941,7 +1941,7 @@ public class JavaParser15 implements JavaParserInterface {
         Expression();
         label_38:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case COMMA:
                     break;
                 default:
@@ -1958,23 +1958,23 @@ public class JavaParser15 implements JavaParserInterface {
             PrimitiveType();
             ArrayDimsAndInits();
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case NEW:
                     jj_consume_token(NEW);
                     ClassOrInterfaceType();
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case LT:
                             TypeArguments();
                             break;
                         default:
                     }
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case LBRACKET:
                             ArrayDimsAndInits();
                             break;
                         case LPAREN:
                             Arguments();
-                            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                            switch (currentTokenType()) {
                                 case LBRACE:
                                     ClassOrInterfaceBody(false);
                                     break;
@@ -2010,13 +2010,13 @@ public class JavaParser15 implements JavaParserInterface {
                 jj_consume_token(RBRACKET);
             }
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case LBRACKET:
                     do {
                         jj_consume_token(LBRACKET);
                         jj_consume_token(RBRACKET);
                     }
-                    while(((jj_ntk == -1) ? jj_ntk() : jj_ntk) == LBRACKET);
+                    while((currentTokenType()) == LBRACKET);
                     ArrayInitializer();
                     break;
                 default:
@@ -2033,7 +2033,7 @@ public class JavaParser15 implements JavaParserInterface {
         if (jj_2_36(2)) {
             LabeledStatement();
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case ASSERT:
                     AssertStatement();
                     break;
@@ -2112,7 +2112,7 @@ public class JavaParser15 implements JavaParserInterface {
     final public void AssertStatement() throws ParseException {
         jj_consume_token(ASSERT);
         Expression();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case COLON:
                 jj_consume_token(COLON);
                 Expression();
@@ -2132,7 +2132,7 @@ public class JavaParser15 implements JavaParserInterface {
         jj_consume_token(LBRACE);
         label_42:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case ABSTRACT:
                 case ASSERT:
                 case BOOLEAN:
@@ -2197,7 +2197,7 @@ public class JavaParser15 implements JavaParserInterface {
             LocalVariableDeclaration();
             jj_consume_token(SEMICOLON);
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case ASSERT:
                 case BOOLEAN:
                 case BREAK:
@@ -2254,7 +2254,7 @@ public class JavaParser15 implements JavaParserInterface {
         VariableDeclarator();
         label_43:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case COMMA:
                     break;
                 default:
@@ -2270,7 +2270,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void StatementExpression() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case INCR:
                 PreIncrementExpression();
                 break;
@@ -2299,7 +2299,7 @@ public class JavaParser15 implements JavaParserInterface {
             case IDENTIFIER:
             case LPAREN:
                 PrimaryExpression();
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                switch (currentTokenType()) {
                     case ASSIGN:
                     case INCR:
                     case DECR:
@@ -2314,7 +2314,7 @@ public class JavaParser15 implements JavaParserInterface {
                     case LSHIFTASSIGN:
                     case RSIGNEDSHIFTASSIGN:
                     case RUNSIGNEDSHIFTASSIGN:
-                        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                        switch (currentTokenType()) {
                             case INCR:
                                 jj_consume_token(INCR);
                                 break;
@@ -2358,7 +2358,7 @@ public class JavaParser15 implements JavaParserInterface {
         jj_consume_token(LBRACE);
         label_44:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case CASE:
                 case _DEFAULT:
                     break;
@@ -2368,7 +2368,7 @@ public class JavaParser15 implements JavaParserInterface {
             SwitchLabel();
             label_45:
             while (true) {
-                switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                switch (currentTokenType()) {
                     case ABSTRACT:
                     case ASSERT:
                     case BOOLEAN:
@@ -2430,7 +2430,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void SwitchLabel() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case CASE:
                 jj_consume_token(CASE);
                 Expression();
@@ -2452,7 +2452,7 @@ public class JavaParser15 implements JavaParserInterface {
         Expression();
         jj_consume_token(RPAREN);
         Statement();
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case ELSE:
                 jj_consume_token(ELSE);
                 Statement();
@@ -2489,7 +2489,7 @@ public class JavaParser15 implements JavaParserInterface {
             jj_consume_token(COLON);
             Expression();
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case ABSTRACT:
                 case BOOLEAN:
                 case BYTE:
@@ -2526,7 +2526,7 @@ public class JavaParser15 implements JavaParserInterface {
                 case AT:
                 case INCR:
                 case DECR:
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case ABSTRACT:
                         case BOOLEAN:
                         case BYTE:
@@ -2567,7 +2567,7 @@ public class JavaParser15 implements JavaParserInterface {
                         default:
                     }
                     jj_consume_token(SEMICOLON);
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case BOOLEAN:
                         case BYTE:
                         case CHAR:
@@ -2600,7 +2600,7 @@ public class JavaParser15 implements JavaParserInterface {
                         default:
                     }
                     jj_consume_token(SEMICOLON);
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case BOOLEAN:
                         case BYTE:
                         case CHAR:
@@ -2642,7 +2642,7 @@ public class JavaParser15 implements JavaParserInterface {
         if (jj_2_39(2147483647)) {
             LocalVariableDeclaration();
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case BOOLEAN:
                 case BYTE:
                 case CHAR:
@@ -2679,7 +2679,7 @@ public class JavaParser15 implements JavaParserInterface {
         StatementExpression();
         label_46:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case COMMA:
                     break;
                 default:
@@ -2696,7 +2696,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void BreakStatement() throws ParseException {
         jj_consume_token(BREAK);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case IDENTIFIER:
                 jj_consume_token(IDENTIFIER);
                 break;
@@ -2707,7 +2707,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ContinueStatement() throws ParseException {
         jj_consume_token(CONTINUE);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case IDENTIFIER:
                 jj_consume_token(IDENTIFIER);
                 break;
@@ -2718,7 +2718,7 @@ public class JavaParser15 implements JavaParserInterface {
 
     final public void ReturnStatement() throws ParseException {
         jj_consume_token(RETURN);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case BOOLEAN:
             case BYTE:
             case CHAR:
@@ -2772,7 +2772,7 @@ public class JavaParser15 implements JavaParserInterface {
         Block();
         label_47:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case CATCH:
                     break;
                 default:
@@ -2784,7 +2784,7 @@ public class JavaParser15 implements JavaParserInterface {
             jj_consume_token(RPAREN);
             Block();
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case FINALLY:
                 jj_consume_token(FINALLY);
                 Block();
@@ -2828,7 +2828,7 @@ public class JavaParser15 implements JavaParserInterface {
         } else if (jj_2_41(2147483647)) {
             SingleMemberAnnotation();
         } else {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case AT:
                     MarkerAnnotation();
                     break;
@@ -2843,7 +2843,7 @@ public class JavaParser15 implements JavaParserInterface {
         jj_consume_token(AT);
         Name();
         jj_consume_token(LPAREN);
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case IDENTIFIER:
                 MemberValuePairs();
                 break;
@@ -2869,7 +2869,7 @@ public class JavaParser15 implements JavaParserInterface {
         MemberValuePair();
         label_48:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case COMMA:
                     break;
                 default:
@@ -2887,7 +2887,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void MemberValue() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case AT:
                 Annotation();
                 break;
@@ -2936,7 +2936,7 @@ public class JavaParser15 implements JavaParserInterface {
             jj_consume_token(COMMA);
             MemberValue();
         }
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case COMMA:
                 jj_consume_token(COMMA);
                 break;
@@ -2957,7 +2957,7 @@ public class JavaParser15 implements JavaParserInterface {
         jj_consume_token(LBRACE);
         label_50:
         while (true) {
-            switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+            switch (currentTokenType()) {
                 case ABSTRACT:
                 case BOOLEAN:
                 case BYTE:
@@ -2993,7 +2993,7 @@ public class JavaParser15 implements JavaParserInterface {
     }
 
     final public void AnnotationTypeMemberDeclaration() throws ParseException {
-        switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+        switch (currentTokenType()) {
             case ABSTRACT:
             case BOOLEAN:
             case BYTE:
@@ -3023,7 +3023,7 @@ public class JavaParser15 implements JavaParserInterface {
                     jj_consume_token(IDENTIFIER);
                     jj_consume_token(LPAREN);
                     jj_consume_token(RPAREN);
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case _DEFAULT:
                             DefaultValue();
                             break;
@@ -3031,7 +3031,7 @@ public class JavaParser15 implements JavaParserInterface {
                     }
                     jj_consume_token(SEMICOLON);
                 } else {
-                    switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+                    switch (currentTokenType()) {
                         case CLASS:
                         case INTERFACE:
                             ClassOrInterfaceDeclaration();
@@ -6055,6 +6055,10 @@ public class JavaParser15 implements JavaParserInterface {
         }
         token = oldToken;
         throw generateParseException();
+    }
+
+    private int currentTokenType() {
+        return (jj_ntk == -1) ? jj_ntk() : jj_ntk;
     }
 
     static private final class LookaheadSuccess extends java.lang.Error {}
